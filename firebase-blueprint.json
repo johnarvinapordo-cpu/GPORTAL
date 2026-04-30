@@ -1,0 +1,116 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Base user profile for all roles",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "studentEmployeeId": { "type": "string", "description": "Student or Employee ID" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["student", "teacher", "admin", "registrar", "finance"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student specific data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "studentId": { "type": "string" },
+        "course": { "type": "string" },
+        "yearLevel": { "type": "integer" },
+        "gpa": { "type": "number" },
+        "enrolledCourses": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["userId", "studentId"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Teacher specific data",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "department": { "type": "string" }
+      },
+      "required": ["userId", "teacherId"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "Available courses",
+      "type": "object",
+      "properties": {
+        "courseCode": { "type": "string" },
+        "title": { "type": "string" },
+        "units": { "type": "integer" },
+        "schedule": { "type": "string" },
+        "instructorId": { "type": "string" }
+      },
+      "required": ["courseCode", "title"]
+    },
+    "Enrollment": {
+      "title": "Enrollment",
+      "description": "Course enrollment records",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["studentId", "courseId", "status"]
+    },
+    "Grade": {
+      "title": "Grade",
+      "description": "Student grades",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "courseId": { "type": "string" },
+        "midterm": { "type": "number" },
+        "finals": { "type": "number" },
+        "gpa": { "type": "number" }
+      },
+      "required": ["studentId", "courseId"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Financial records",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "totalAmount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "balance": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["studentId", "totalAmount"]
+    },
+    "Evaluation": {
+      "title": "Evaluation",
+      "description": "Teacher evaluations",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "ratings": { "type": "object" },
+        "comments": { "type": "string" }
+      },
+      "required": ["studentId", "teacherId"]
+    }
+  },
+  "firestore": {
+    "users": { "schema": "User", "description": "User profiles" },
+    "students": { "schema": "Student", "description": "Student details" },
+    "teachers": { "schema": "Teacher", "description": "Teacher details" },
+    "courses": { "schema": "Course", "description": "Course catalog" },
+    "enrollments": { "schema": "Enrollment", "description": "Student enrollments" },
+    "grades": { "schema": "Grade", "description": "Academic records" },
+    "payments": { "schema": "Payment", "description": "Financial ledger" },
+    "evaluations": { "schema": "Evaluation", "description": "Student feedback" }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "CMDI Grade Portal",
+  "description": "A comprehensive academic, enrollment, and financial management system with role-based access for Students, Teachers, Admins, Registrar, and Finance roles.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
