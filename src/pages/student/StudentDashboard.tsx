@@ -9,7 +9,6 @@ import {
   BookOpen,
   DollarSign,
   Bell,
-  Calendar,
   TrendingUp
 } from "lucide-react";
 
@@ -28,7 +27,7 @@ import {
 export default function StudentDashboard() {
   const studentName = "Juan Dela Cruz";
 
-  // 📊 Charts Data
+  // 📊 Charts
   const gpaData = [
     { name: "Sem 1", gpa: 3.2 },
     { name: "Sem 2", gpa: 3.4 },
@@ -45,12 +44,22 @@ export default function StudentDashboard() {
     { subject: "Filipino", grade: 85 },
   ];
 
-  // 📚 Courses
+  // 📚 Courses (IMPROVED)
   const enrolledCourses = [
-    { code: "CS101", name: "Introduction to Programming", units: 3 },
-    { code: "MATH201", name: "Calculus I", units: 3 },
-    { code: "ENG102", name: "English Composition", units: 3 },
-    { code: "PE101", name: "Physical Education", units: 2 },
+    {
+      code: "CS101",
+      name: "Introduction to Programming",
+      units: 3,
+      schedule: "MWF 9:00-10:00 AM",
+      instructor: "Prof. Maria Santos",
+    },
+    {
+      code: "MATH201",
+      name: "Calculus I",
+      units: 3,
+      schedule: "TTh 10:00-11:30 AM",
+      instructor: "Prof. Jose Garcia",
+    },
   ];
 
   // 📢 Announcements
@@ -72,9 +81,11 @@ export default function StudentDashboard() {
         {/* HEADER */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Welcome back, {studentName} 👋</h1>
+            <h1 className="text-3xl font-bold">
+              Welcome back, {studentName} 👋
+            </h1>
             <p className="text-muted-foreground">
-              Here's your academic overview and progress.
+              Here's your academic overview.
             </p>
           </div>
 
@@ -84,7 +95,7 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* STATS CARDS */}
+        {/* STATS */}
         <div className="grid md:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex justify-between flex-row">
@@ -92,21 +103,21 @@ export default function StudentDashboard() {
               <GraduationCap size={18} />
             </CardHeader>
             <CardContent>
-              <h2 className="text-2xl font-bold">3.82</h2>
+              <h2 className="text-2xl font-bold text-primary">3.75</h2>
               <p className="text-green-500 text-sm flex items-center gap-1">
-                <TrendingUp size={14}/> +0.2 increase
+                <TrendingUp size={14}/> +0.15
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex justify-between flex-row">
-              <CardTitle className="text-sm">Units</CardTitle>
+              <CardTitle className="text-sm">Courses</CardTitle>
               <BookOpen size={18} />
             </CardHeader>
             <CardContent>
-              <h2 className="text-2xl font-bold">21</h2>
-              <p className="text-muted-foreground text-sm">Full load</p>
+              <h2 className="text-2xl font-bold">4</h2>
+              <p className="text-muted-foreground text-sm">11 Units</p>
             </CardContent>
           </Card>
 
@@ -133,12 +144,11 @@ export default function StudentDashboard() {
           </Card>
         </div>
 
-        {/* CHARTS */}
+        {/* CHARTS (KEEP THIS – IMPORTANT FOR THESIS) */}
         <div className="grid lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>GPA Trend</CardTitle>
-              <CardDescription>Semester performance</CardDescription>
             </CardHeader>
             <CardContent className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -156,7 +166,6 @@ export default function StudentDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Grades Overview</CardTitle>
-              <CardDescription>Current subjects</CardDescription>
             </CardHeader>
             <CardContent className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -172,63 +181,60 @@ export default function StudentDashboard() {
           </Card>
         </div>
 
-        {/* COURSES + ANNOUNCEMENTS */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          
-          {/* COURSES */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Enrolled Courses</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {enrolledCourses.map((course, i) => (
-                <div key={i} className="flex justify-between items-center border p-3 rounded-lg">
-                  <div>
-                    <p className="font-semibold">{course.code}</p>
-                    <p className="text-sm text-muted-foreground">{course.name}</p>
-                  </div>
-                  <Badge>{course.units} Units</Badge>
+        {/* COURSES */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Enrolled Courses</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {enrolledCourses.map((c, i) => (
+              <div key={i} className="border p-3 rounded-lg">
+                <div className="flex justify-between">
+                  <p className="font-semibold">{c.code}</p>
+                  <Badge>{c.units} Units</Badge>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+                <p className="text-sm text-muted-foreground">{c.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {c.schedule} • {c.instructor}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
 
-          {/* ANNOUNCEMENTS */}
+        {/* ANNOUNCEMENTS + DEADLINES */}
+        <div className="grid lg:grid-cols-2 gap-6">
           <Card>
             <CardHeader>
               <CardTitle>Announcements</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {announcements.map((item, i) => (
-                <div key={i} className="flex justify-between">
-                  <div>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-sm text-muted-foreground">{item.date}</p>
+              {announcements.map((a, i) => (
+                <div key={i}>
+                  <p className="font-medium">{a.title}</p>
+                  <p className="text-sm text-muted-foreground">{a.date}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Deadlines</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {deadlines.map((d, i) => (
+                <div key={i}>
+                  <div className="flex justify-between">
+                    <p>{d.task}</p>
+                    <p className="text-sm text-muted-foreground">{d.date}</p>
                   </div>
-                  <Badge variant="secondary">New</Badge>
+                  <Progress value={70} />
                 </div>
               ))}
             </CardContent>
           </Card>
         </div>
-
-        {/* DEADLINES */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Deadlines</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {deadlines.map((d, i) => (
-              <div key={i}>
-                <div className="flex justify-between">
-                  <p>{d.task}</p>
-                  <p className="text-sm text-muted-foreground">{d.date}</p>
-                </div>
-                <Progress value={70} className="mt-2" />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
 
       </div>
     </DashboardLayout>

@@ -14,6 +14,14 @@ import {
 import { Line, Bar, Pie } from 'react-chartjs-2'
 import type { AppUser } from '@/types'
 
+import {
+  GraduationCap,
+  BookOpen,
+  DollarSign,
+  Bell,
+  TrendingUp
+} from 'lucide-react'
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -110,8 +118,8 @@ export default function StudentDashboard({ user }: { user: User }) {
       {
         label: 'Grades',
         data: [2.0, parseFloat(gpaDisplay) || 1.8, parseFloat(gpaDisplay) || 1.7],
-        borderColor: '#1e293b',
-        backgroundColor: '#1e293b',
+        borderColor: '#3b82f6',
+        backgroundColor: '#3b82f6',
         borderWidth: 2,
         fill: false
       }
@@ -124,7 +132,7 @@ export default function StudentDashboard({ user }: { user: User }) {
       {
         label: 'Attendance %',
         data: [100, 90, 95, 85, 100],
-        backgroundColor: ['#1e293b', '#334155', '#475569', '#64748b', '#94a3b8'],
+        backgroundColor: ['#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe', '#dbeafe'],
         borderWidth: 1
       }
     ]
@@ -141,7 +149,7 @@ export default function StudentDashboard({ user }: { user: User }) {
     ]
   }
 
-  const tuitionProgress = totalBalance > 0 && totalPaid + totalBalance > 0
+const tuitionProgress = totalBalance > 0 && totalPaid + totalBalance > 0
     ? Math.min(100, Math.round((totalPaid / (totalPaid + totalBalance)) * 100))
     : 100
 
@@ -153,8 +161,9 @@ export default function StudentDashboard({ user }: { user: User }) {
     }
   }
 
-return (
+  return (
     <div className="space-y-8">
+      {/* Header Banner */}
       <div className="rounded-b-3xl border-b border-blue-900/30 bg-slate-900/50 px-6 py-8 shadow-sm">
         <div className="max-w-6xl mx-auto">
           <p className="text-sm font-semibold uppercase tracking-[0.4em] text-blue-400">CARD-MRI Development Institute Inc.</p>
@@ -163,6 +172,7 @@ return (
       </div>
 
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Welcome Section */}
         <div className="rounded-3xl bg-slate-900 p-8 shadow-sm border border-blue-900/30">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -179,16 +189,19 @@ return (
           </div>
         </div>
 
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-3xl border border-blue-900/30 bg-slate-900 p-6 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-400">Current GPA</p>
                 <p className="mt-4 text-4xl font-bold text-white">{gpaDisplay}</p>
-                <p className="mt-2 text-sm text-emerald-400">+0.15 from last semester</p>
+                <p className="mt-2 text-sm text-emerald-400 flex items-center gap-1">
+                  <TrendingUp size={14}/> +0.15
+                </p>
               </div>
-              <div className="rounded-3xl bg-slate-800 p-3 text-blue-300">
-                <span className="text-xl">🎓</span>
+              <div className="rounded-3xl bg-blue-600 p-3">
+                <GraduationCap className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
@@ -200,8 +213,8 @@ return (
                 <p className="mt-4 text-4xl font-bold text-white">{courses.length}</p>
                 <p className="mt-2 text-sm text-blue-400">{totalUnits} total units</p>
               </div>
-              <div className="rounded-3xl bg-slate-800 p-3 text-blue-300">
-                <span className="text-xl">📚</span>
+              <div className="rounded-3xl bg-blue-600 p-3">
+                <BookOpen className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
@@ -213,12 +226,12 @@ return (
                 <p className="mt-4 text-4xl font-bold text-white">₱{totalBalance.toLocaleString()}</p>
                 <p className="mt-2 text-sm text-blue-400">{totalBalance > 0 ? `${Math.max(0, Math.round(((totalBalance + totalPaid) > 0 ? totalPaid / (totalPaid + totalBalance) * 100 : 0)))}% paid` : 'Paid in full'}</p>
               </div>
-              <div className="rounded-3xl bg-slate-800 p-3 text-blue-300">
-                <span className="text-xl">💳</span>
+              <div className="rounded-3xl bg-blue-600 p-3">
+                <DollarSign className="w-6 h-6 text-white" />
               </div>
             </div>
             <div className="mt-6 h-2 overflow-hidden rounded-full bg-slate-800">
-              <div className={`h-full rounded-full bg-blue-600 w-[${tuitionProgress}%]`} />
+              <div className={`h-full rounded-full bg-blue-600`} style={{ width: `${tuitionProgress}%` }} />
             </div>
           </div>
 
@@ -229,14 +242,15 @@ return (
                 <p className="mt-4 text-4xl font-bold text-white">5</p>
                 <p className="mt-2 text-sm text-blue-400">3 unread messages</p>
               </div>
-              <div className="rounded-3xl bg-slate-800 p-3 text-blue-300">
-                <span className="text-xl">🔔</span>
+              <div className="rounded-3xl bg-blue-600 p-3">
+                <Bell className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Charts Section */}
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
           <div className="bg-slate-900 border border-blue-900/30 p-5 rounded-lg shadow-md">
@@ -261,6 +275,7 @@ return (
           </div>
         </div>
 
+        {/* Courses Table */}
         <div className="bg-slate-900 border border-blue-900/30 p-5 rounded-lg shadow-md mt-8">
           <h2 className="text-xl font-bold mb-4 text-white">My Subjects</h2>
           <table className="w-full border-collapse">
