@@ -1,48 +1,87 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import Login from './pages/Login'
+import StudentDashboard from './pages/student/Dashboard'
+import TeacherDashboard from './pages/teacher/Dashboard'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import RegistrarDashboard from './pages/registrar/Dashboard'
+import FinanceDashboard from './pages/finance/Dashboard'
+import Sidebar from './components/Sidebar'
+import Header from './components/Header'
+import type { AppUser } from './types'
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Login from './pages/Login';
-import DashboardLayout from './components/layout/DashboardLayout';
-import StudentDashboard from './pages/student/StudentDashboard';
-import TeacherDashboard from './pages/teacher/TeacherDashboard';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import RegistrarDashboard from './pages/registrar/RegistrarDashboard';
-import FinanceDashboard from './pages/finance/FinanceDashboard';
-import { Toaster } from './components/ui/sonner';
-import { TooltipProvider } from './components/ui/tooltip';
+function App() {
+  const [user, setUser] = useState<AppUser | null>(null)
+  const [loading, setLoading] = useState(true)
 
-export default function App() {
-  return (
-    <TooltipProvider>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            
-            {/* Dashboard Routes with Shared Layout */}
-            <Route path="/" element={<DashboardLayout />}>
-              <Route index element={<Navigate to="/login" replace />} />
-              
-              {/* Role specific dashboards */}
-              <Route path="student/dashboard" element={<StudentDashboard />} />
-              <Route path="teacher/dashboard" element={<TeacherDashboard />} />
-              <Route path="admin/dashboard" element={<AdminDashboard />} />
-              <Route path="registrar/dashboard" element={<RegistrarDashboard />} />
-              <Route path="finance/dashboard" element={<FinanceDashboard />} />
-              
-              {/* Fallback within dashboard */}
-              <Route path="*" element={<div className="p-8 text-center text-muted-foreground">Feature coming soon or Page Not Found.</div>} />
-            </Route>
+  useEffect(() => {
+    const storedUser = localStorage.getItem('cmdi_user')
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+    }
+    setLoading(false)
+  }, [])
 
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </Router>
-        <Toaster position="top-right" />
-      </AuthProvider>
-    </TooltipProvider>
-  );
+  const handleLogin = (userData: AppUser) => {
+    setUser(userData)
+    localStorage.setItem('cmdi_user', JSON.stringify(userData))
+  }
+
+  const handleLogout = () => {
+    setUser(null)
+    localStorage.removeItem('cmdi_user')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+if (!user) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    )
+  }
+
+  const getDashboard = () => {
+    switch (user.role) {
+      case 'student':
+        return <StudentDashboard user={user as Extract<AppUser, { role: 'student' }>} />
+      case 'teacher':
+        return <TeacherDashboard user={user as Extract<AppUser, { role: 'teacher' }>} />
+      case 'admin':
+        return <AdminDashboard user={user as Extract<AppUser, { role: 'admin' }>} />
+      case 'registrar':
+        return <RegistrarDashboard user={user as Extract<AppUser, { role: 'registrar' }>} />
+      case 'finance':
+        return <FinanceDashboard user={user as Extract<AppUser, { role: 'finance' }>} />
+      default:
+        return <Navigate to="/login" replace />
+    }
+  }
+
+return (
+    <Router>
+      <div className="min-h-screen bg-slate-950 flex">
+        <Sidebar user={user} onLogout={handleLogout} />
+        <div className="flex-1 flex flex-col ml-64">
+          <Header user={user} onLogout={handleLogout} />
+          <main className="flex-1 p-6 mt-16 bg-slate-950">
+            {getDashboard()}
+          </main>
+        </div>
+      </div>
+    </Router>
+  )
 }
+
+export default App

@@ -1,180 +1,236 @@
-import React from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import DashboardLayout from "../components/DashboardLayout";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Progress } from "../components/ui/progress";
+
+import {
+  GraduationCap,
+  BookOpen,
+  DollarSign,
+  Bell,
+  Calendar,
+  TrendingUp
+} from "lucide-react";
+
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   BarChart,
   Bar
-} from 'recharts';
-import { 
-  GraduationCap, 
-  BookOpen, 
-  CreditCard, 
-  Clock, 
-  TrendingUp,
-  AlertCircle
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from "recharts";
 
-const studentData = [
-  { name: 'Sem 1', gpa: 3.2 },
-  { name: 'Sem 2', gpa: 3.4 },
-  { name: 'Sem 3', gpa: 3.1 },
-  { name: 'Sem 4', gpa: 3.7 },
-  { name: 'Sem 5', gpa: 3.8 },
-];
+export default function StudentDashboard() {
+  const studentName = "Juan Dela Cruz";
 
-const gradesData = [
-  { subject: 'Math', grade: 92 },
-  { subject: 'Physics', grade: 88 },
-  { subject: 'History', grade: 95 },
-  { subject: 'CS101', grade: 98 },
-  { subject: 'Filipino', grade: 85 },
-];
+  // 📊 Charts Data
+  const gpaData = [
+    { name: "Sem 1", gpa: 3.2 },
+    { name: "Sem 2", gpa: 3.4 },
+    { name: "Sem 3", gpa: 3.1 },
+    { name: "Sem 4", gpa: 3.7 },
+    { name: "Sem 5", gpa: 3.8 },
+  ];
 
-const StudentDashboard: React.FC = () => {
-  const { profile } = useAuth();
+  const gradesData = [
+    { subject: "Math", grade: 92 },
+    { subject: "Physics", grade: 88 },
+    { subject: "History", grade: 95 },
+    { subject: "CS101", grade: 98 },
+    { subject: "Filipino", grade: 85 },
+  ];
+
+  // 📚 Courses
+  const enrolledCourses = [
+    { code: "CS101", name: "Introduction to Programming", units: 3 },
+    { code: "MATH201", name: "Calculus I", units: 3 },
+    { code: "ENG102", name: "English Composition", units: 3 },
+    { code: "PE101", name: "Physical Education", units: 2 },
+  ];
+
+  // 📢 Announcements
+  const announcements = [
+    { title: "Midterm Examination Schedule", date: "March 15, 2026" },
+    { title: "Enrollment for Summer Classes Now Open", date: "March 10, 2026" },
+  ];
+
+  // ⏰ Deadlines
+  const deadlines = [
+    { task: "Programming Project", date: "March 20, 2026" },
+    { task: "Math Problem Set", date: "March 22, 2026" },
+  ];
 
   return (
-    <div className="space-y-6 pb-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Academic Overview</h1>
-          <p className="text-muted-foreground">Welcome back, {profile?.name}. Here's your current status.</p>
-        </div>
-        <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="bg-card">Download PDF Report</Button>
-            <Button size="sm">Enroll in Courses</Button>
-        </div>
-      </div>
+    <DashboardLayout userRole="student" userName={studentName}>
+      <div className="space-y-6">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Current GPA</CardTitle>
-            <GraduationCap className="h-4 w-4 text-primary" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">3.82</div>
-            <p className="text-xs text-green-400 flex items-center mt-1">
-              <TrendingUp className="h-3 w-3 mr-1" />
-              +0.2 from last semester
+        {/* HEADER */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Welcome back, {studentName} 👋</h1>
+            <p className="text-muted-foreground">
+              Here's your academic overview and progress.
             </p>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Enrolled Units</CardTitle>
-            <BookOpen className="h-4 w-4 text-blue-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">21</div>
-            <p className="text-xs text-muted-foreground mt-1">Full-time load</p>
-          </CardContent>
-        </Card>
+          <div className="flex gap-2">
+            <Button variant="outline">Download Report</Button>
+            <Button>Enroll</Button>
+          </div>
+        </div>
 
-        <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Tuition Balance</CardTitle>
-            <CreditCard className="h-4 w-4 text-amber-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₱12,450</div>
-            <Badge variant="outline" className="mt-2 text-amber-400 bg-amber-400/10 border-amber-400/20">Payment Due May 15</Badge>
-          </CardContent>
-        </Card>
+        {/* STATS CARDS */}
+        <div className="grid md:grid-cols-4 gap-6">
+          <Card>
+            <CardHeader className="flex justify-between flex-row">
+              <CardTitle className="text-sm">GPA</CardTitle>
+              <GraduationCap size={18} />
+            </CardHeader>
+            <CardContent>
+              <h2 className="text-2xl font-bold">3.82</h2>
+              <p className="text-green-500 text-sm flex items-center gap-1">
+                <TrendingUp size={14}/> +0.2 increase
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card className="border-none shadow-sm bg-card hover:shadow-md transition-shadow">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Messages</CardTitle>
-            <AlertCircle className="h-4 w-4 text-indigo-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">4</div>
-            <p className="text-xs text-indigo-400 mt-1">2 from Registrar</p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader className="flex justify-between flex-row">
+              <CardTitle className="text-sm">Units</CardTitle>
+              <BookOpen size={18} />
+            </CardHeader>
+            <CardContent>
+              <h2 className="text-2xl font-bold">21</h2>
+              <p className="text-muted-foreground text-sm">Full load</p>
+            </CardContent>
+          </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="border-none shadow-sm">
-          <CardHeader>
-            <CardTitle>GPA Performance</CardTitle>
-            <CardDescription>Visualizing your academic progress over time</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={studentData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} dy={10} />
-                <YAxis domain={[0, 4]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                <Tooltip 
-                    contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '12px', border: '1px solid var(--border)', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                    itemStyle={{ color: 'var(--foreground)' }}
-                />
-                <Line type="monotone" dataKey="gpa" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4, fill: 'var(--primary)' }} activeDot={{ r: 6 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex justify-between flex-row">
+              <CardTitle className="text-sm">Balance</CardTitle>
+              <DollarSign size={18} />
+            </CardHeader>
+            <CardContent>
+              <h2 className="text-2xl font-bold">₱12,450</h2>
+              <Badge variant="outline">Due May 15</Badge>
+            </CardContent>
+          </Card>
 
-        <Card className="border-none shadow-sm">
-          <CardHeader>
-            <CardTitle>Current Semester Breakdown</CardTitle>
-            <CardDescription>Your current performance per subject</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={gradesData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                <YAxis domain={[0, 100]} axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '12px', border: '1px solid var(--border)' }} />
-                <Bar dataKey="grade" fill="#38bdf8" radius={[4, 4, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader className="flex justify-between flex-row">
+              <CardTitle className="text-sm">Notifications</CardTitle>
+              <Bell size={18} />
+            </CardHeader>
+            <CardContent>
+              <h2 className="text-2xl font-bold">4</h2>
+              <p className="text-muted-foreground text-sm">2 new</p>
+            </CardContent>
+          </Card>
+        </div>
 
-      <Card className="border-none shadow-sm">
-        <CardHeader>
-          <CardTitle>Upcoming Deadlines</CardTitle>
-          <CardDescription>Don't miss these important academic dates</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[
-              { title: 'Enrollment Approval', date: 'May 5, 2026', type: 'Registrar', status: 'Pending' },
-              { title: 'Computer Science Midterm Project', date: 'May 10, 2026', type: 'Academic', status: 'In Progress' },
-              { title: 'Tuition Installment 2', date: 'May 15, 2026', type: 'Finance', status: 'Urgent' },
-            ].map((item, idx) => (
-              <div key={idx} className="flex flex-row items-center justify-between p-4 rounded-xl border border-border hover:bg-accent/50 transition-colors">
-                <div className="flex flex-row items-center gap-4">
-                  <div className="bg-muted p-2 rounded-lg">
-                    <Clock className="h-5 w-5 text-muted-foreground" />
-                  </div>
+        {/* CHARTS */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>GPA Trend</CardTitle>
+              <CardDescription>Semester performance</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={gpaData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis domain={[0, 4]} />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="gpa" strokeWidth={3} />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Grades Overview</CardTitle>
+              <CardDescription>Current subjects</CardDescription>
+            </CardHeader>
+            <CardContent className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={gradesData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="subject" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="grade" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* COURSES + ANNOUNCEMENTS */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          
+          {/* COURSES */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Enrolled Courses</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {enrolledCourses.map((course, i) => (
+                <div key={i} className="flex justify-between items-center border p-3 rounded-lg">
                   <div>
-                    <h4 className="font-semibold text-foreground">{item.title}</h4>
-                    <p className="text-xs text-muted-foreground">{item.type} • {item.date}</p>
+                    <p className="font-semibold">{course.code}</p>
+                    <p className="text-sm text-muted-foreground">{course.name}</p>
                   </div>
+                  <Badge>{course.units} Units</Badge>
                 </div>
-                <Badge variant={item.status === 'Urgent' ? 'destructive' : 'secondary'}>{item.status}</Badge>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* ANNOUNCEMENTS */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Announcements</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {announcements.map((item, i) => (
+                <div key={i} className="flex justify-between">
+                  <div>
+                    <p className="font-medium">{item.title}</p>
+                    <p className="text-sm text-muted-foreground">{item.date}</p>
+                  </div>
+                  <Badge variant="secondary">New</Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* DEADLINES */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming Deadlines</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {deadlines.map((d, i) => (
+              <div key={i}>
+                <div className="flex justify-between">
+                  <p>{d.task}</p>
+                  <p className="text-sm text-muted-foreground">{d.date}</p>
+                </div>
+                <Progress value={70} className="mt-2" />
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+          </CardContent>
+        </Card>
 
-export default StudentDashboard;
+      </div>
+    </DashboardLayout>
+  );
+}

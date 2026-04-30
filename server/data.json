@@ -1,0 +1,33 @@
+{
+  "users": [
+    { "id": 1, "user_id": "STU-001", "name": "Juan Dela Cruz", "email": "juan@cmdi.edu", "password": "demo123", "role": "student" },
+    { "id": 2, "user_id": "TCH-001", "name": "Maria Santos", "email": "maria@cmdi.edu", "password": "demo123", "role": "teacher" },
+    { "id": 3, "user_id": "ADM-001", "name": "Admin User", "email": "admin@cmdi.edu", "password": "demo123", "role": "admin" },
+    { "id": 4, "user_id": "REG-001", "name": "Registrar User", "email": "registrar@cmdi.edu", "password": "demo123", "role": "registrar" },
+    { "id": 5, "user_id": "FIN-001", "name": "Finance User", "email": "finance@cmdi.edu", "password": "demo123", "role": "finance" }
+  ],
+  "courses": [
+    { "id": 1, "course_code": "CS101", "title": "Introduction to Programming", "units": 3, "schedule": "MWF 9:00-10:00", "instructor_id": "TCH-001", "capacity": 40 },
+    { "id": 2, "course_code": "CS201", "title": "Data Structures", "units": 4, "schedule": "TTH 10:00-12:00", "instructor_id": "TCH-001", "capacity": 35 },
+    { "id": 3, "course_code": "MATH201", "title": "Calculus II", "units": 4, "schedule": "MWF 11:00-12:00", "instructor_id": "TCH-001", "capacity": 45 },
+    { "id": 4, "course_code": "ENG101", "title": "Technical Writing", "units": 3, "schedule": "MWF 1:00-2:00", "instructor_id": "TCH-001", "capacity": 40 }
+  ],
+  "enrollments": [
+    { "id": 1, "student_id": "STU-001", "course_id": 1, "status": "approved", "enrolled_at": "2024-01-15" },
+    { "id": 2, "student_id": "STU-001", "course_id": 2, "status": "approved", "enrolled_at": "2024-01-15" }
+  ],
+  "grades": [
+    { "id": 1, "student_id": "STU-001", "course_id": 1, "midterm": 88, "finals": 92 },
+    { "id": 2, "student_id": "STU-001", "course_id": 2, "midterm": 85, "finals": 88 }
+  ],
+  "payments": [
+    { "id": 1, "student_id": "STU-001", "total_amount": 30000, "paid_amount": 30000, "due_date": "2024-01-31", "status": "paid" },
+    { "id": 2, "student_id": "STU-001", "total_amount": 15000, "paid_amount": 0, "due_date": "2024-02-28", "status": "pending" }
+  ],
+  "students": [
+    { "id": 1, "user_id": "STU-001", "course": "BS Computer Science", "year_level": 3, "gpa": 3.5 }
+  ],
+  "teachers": [
+    { "id": 1, "user_id": "TCH-001", "department": "Computer Science" }
+  ]
+}
