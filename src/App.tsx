@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import StudentDashboard from './pages/student/Dashboard'
+import EnrollmentPage from './pages/student/EnrollmentPage'
 import TeacherDashboard from './pages/teacher/Dashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import RegistrarDashboard from './pages/registrar/Dashboard'
@@ -11,25 +12,14 @@ import Header from './components/Header'
 import type { AppUser } from './types'
 
 function App() {
-  const [user, setUser] = useState<AppUser | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('cmdi_user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-    setLoading(false)
-  }, [])
+  const { user, setUser, logout, loading } = useAuth()
 
   const handleLogin = (userData: AppUser) => {
     setUser(userData)
-    localStorage.setItem('cmdi_user', JSON.stringify(userData))
   }
 
   const handleLogout = () => {
-    setUser(null)
-    localStorage.removeItem('cmdi_user')
+    logout()
   }
 
   if (loading) {
@@ -52,10 +42,17 @@ if (!user) {
     )
   }
 
+  const renderStudentRoutes = () => (
+    <Routes>
+      <Route path="/student" element={<StudentDashboard user={user as Extract<AppUser, { role: 'student' }>} />} />
+      <Route path="/student/enrollment" element={<EnrollmentPage />} />
+    </Routes>
+  )
+
   const getDashboard = () => {
     switch (user.role) {
       case 'student':
-        return <StudentDashboard user={user as Extract<AppUser, { role: 'student' }>} />
+        return renderStudentRoutes()
       case 'teacher':
         return <TeacherDashboard user={user as Extract<AppUser, { role: 'teacher' }>} />
       case 'admin':

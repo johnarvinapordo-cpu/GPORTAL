@@ -81,20 +81,11 @@ export default function StudentDashboard({ user }: { user: User }) {
   const [payments, setPayments] = useState<Payment[]>([])
 
   useEffect(() => {
-    fetch(`/api/student/${user.user_id}`)
-      .then(res => res.json())
-      .then(data => {
-        setCourses(data.courses || [])
-        setGrades(data.grades || [])
-        setPayments(data.payments || [])
-      })
-      .catch(() => {
-        // Fallback to demo data if server is not running
-        setCourses(demoCourses)
-        setGrades(demoGrades)
-        setPayments(demoPayments)
-      })
-  }, [user.user_id])
+    // TEMP: mock data (no API yet)
+    setCourses(demoCourses)
+    setGrades(demoGrades)
+    setPayments(demoPayments)
+  }, [])
 
   const totalUnits = courses.reduce((acc, c) => acc + c.units, 0)
   const totalBalance = payments.reduce((acc, p) => acc + (p.total_amount - p.paid_amount), 0)
