@@ -78,6 +78,43 @@ CREATE TABLE IF NOT EXISTS payments (
   FOREIGN KEY (student_id) REFERENCES users(user_id)
 );
 
+-- Assignments table
+CREATE TABLE IF NOT EXISTS assignments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  course_id INT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  description TEXT,
+  due_date DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+
+-- Submissions table
+CREATE TABLE IF NOT EXISTS submissions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_id VARCHAR(50) NOT NULL,
+  assignment_id INT NOT NULL,
+  content TEXT NOT NULL,
+  submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status ENUM('pending', 'submitted', 'graded') DEFAULT 'submitted',
+  grade DECIMAL(5,2),
+  feedback TEXT,
+  FOREIGN KEY (student_id) REFERENCES users(user_id),
+  FOREIGN KEY (assignment_id) REFERENCES assignments(id)
+);
+
+-- Notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id VARCHAR(50),
+  type ENUM('enrollment', 'grade', 'billing', 'evaluation', 'submission', 'system') NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  message TEXT NOT NULL,
+  read BOOLEAN DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
 -- Insert demo users (password: demo123)
 INSERT IGNORE INTO users (user_id, name, email, password, role) VALUES
 ('STU-001', 'Juan Dela Cruz', 'juan@cmdi.edu', '$2a$10$demo123', 'student'),
@@ -108,3 +145,23 @@ INSERT IGNORE INTO grades (student_id, course_id, midterm, finals) VALUES
 INSERT IGNORE INTO payments (student_id, total_amount, paid_amount, due_date, status) VALUES
 ('STU-001', 30000, 30000, '2024-01-15', 'paid'),
 ('STU-001', 15000, 0, '2024-02-15', 'pending');
+
+-- Insert demo assignments
+INSERT IGNORE INTO assignments (course_id, title, description, due_date) VALUES
+(1, 'Programming Assignment 1', 'Create a simple calculator program', '2024-05-15'),
+(1, 'Programming Assignment 2', 'Implement a linked list data structure', '2024-05-22'),
+(2, 'Calculus Problem Set', 'Solve calculus problems 1-20', '2024-05-18'),
+(3, 'Essay Submission', 'Write an essay on technical writing', '2024-05-25');
+
+-- Insert demo submissions
+INSERT IGNORE INTO submissions (student_id, assignment_id, content, submitted_at, status, grade, feedback) VALUES
+('STU-001', 1, 'Calculator program code...', '2024-05-14', 'graded', 95, 'Excellent work. Shows good understanding of concepts.'),
+('STU-001', 3, 'Problem set solutions...', '2024-05-18', 'submitted', NULL, NULL);
+
+-- Insert demo notifications
+INSERT IGNORE INTO notifications (user_id, type, title, message, read, created_at) VALUES
+('STU-001', 'enrollment', 'Enrollment Approved', 'Your enrollment in CS101 has been approved. You can now access the course materials.', 0, NOW() - INTERVAL 2 HOUR),
+('STU-001', 'grade', 'Grades Posted', 'Your midterm grades for MATH201 have been posted. Check your dashboard for details.', 0, NOW() - INTERVAL 24 HOUR),
+('STU-001', 'billing', 'Payment Due', 'Your tuition payment of ₱25,000 is due on May 31, 2024. Please pay online or at the cashier.', 1, NOW() - INTERVAL 3 DAY),
+('STU-001', 'submission', 'Assignment Submitted', 'Your assignment submission has been received', 1, NOW() - INTERVAL 5 DAY),
+('STU-001', 'system', 'System Maintenance', 'The portal will be under maintenance on June 1, 2024 from 2:00 AM to 4:00 AM.', 1, NOW() - INTERVAL 7 DAY);

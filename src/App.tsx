@@ -1,9 +1,12 @@
+import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import StudentDashboard from './pages/student/Dashboard'
-import EnrollmentPage from './pages/student/EnrollmentPage'
+import EnrollmentPage from './pages/Enrollment'
+import SubmissionsPage from './pages/student/Submissions'
 import TeacherDashboard from './pages/teacher/Dashboard'
+import EvaluationsPage from './pages/teacher/Evaluations'
+import NotificationsPage from './pages/Notifications'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import RegistrarDashboard from './pages/registrar/Dashboard'
 import FinanceDashboard from './pages/finance/Dashboard'
@@ -12,14 +15,33 @@ import Header from './components/Header'
 import type { AppUser } from './types'
 
 function App() {
-  const { user, setUser, logout, loading } = useAuth()
+  const [user, setUser] = useState<AppUser | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('cmdi_user') || localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch {
+        localStorage.removeItem('cmdi_user')
+        localStorage.removeItem('user')
+      }
+    }
+    setLoading(false)
+  }, [])
 
   const handleLogin = (userData: AppUser) => {
     setUser(userData)
+    localStorage.setItem('cmdi_user', JSON.stringify(userData))
+    localStorage.setItem('user', JSON.stringify(userData))
   }
 
   const handleLogout = () => {
-    logout()
+    setUser(null)
+    localStorage.removeItem('cmdi_user')
+    localStorage.removeItem('cmdi_token')
+    localStorage.removeItem('user')
   }
 
   if (loading) {
@@ -30,7 +52,7 @@ function App() {
     )
   }
 
-if (!user) {
+  if (!user) {
     return (
       <Router>
         <Routes>
@@ -44,8 +66,22 @@ if (!user) {
 
   const renderStudentRoutes = () => (
     <Routes>
-      <Route path="/student" element={<StudentDashboard user={user as Extract<AppUser, { role: 'student' }>} />} />
+      <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
+      <Route path="/student/dashboard" element={<StudentDashboard user={user as Extract<AppUser, { role: 'student' }>} />} />
       <Route path="/student/enrollment" element={<EnrollmentPage />} />
+      <Route path="/student/submissions" element={<SubmissionsPage />} />
+      <Route path="/student/notifications" element={<NotificationsPage />} />
+      <Route path="*" element={<Navigate to="/student/dashboard" replace />} />
+    </Routes>
+  )
+
+  const renderTeacherRoutes = () => (
+    <Routes>
+      <Route path="/teacher" element={<Navigate to="/teacher/dashboard" replace />} />
+      <Route path="/teacher/dashboard" element={<TeacherDashboard user={user as Extract<AppUser, { role: 'teacher' }>} />} />
+      <Route path="/teacher/evaluations" element={<EvaluationsPage />} />
+      <Route path="/teacher/notifications" element={<NotificationsPage />} />
+      <Route path="*" element={<Navigate to="/teacher/dashboard" replace />} />
     </Routes>
   )
 
@@ -54,7 +90,7 @@ if (!user) {
       case 'student':
         return renderStudentRoutes()
       case 'teacher':
-        return <TeacherDashboard user={user as Extract<AppUser, { role: 'teacher' }>} />
+        return renderTeacherRoutes()
       case 'admin':
         return <AdminDashboard user={user as Extract<AppUser, { role: 'admin' }>} />
       case 'registrar':

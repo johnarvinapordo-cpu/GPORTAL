@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { CreditCard, DollarSign, Wallet, TrendingUp, PieChart, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { CreditCard, DollarSign, Wallet, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -105,7 +105,7 @@ const FinanceDashboard: React.FC = () => {
                     itemStyle={{ color: 'var(--foreground)' }}
                  />
                 <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
-                  {paymentStats.map((entry, index) => (
+                  {paymentStats.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Bar>

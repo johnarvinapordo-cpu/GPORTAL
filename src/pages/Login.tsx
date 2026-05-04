@@ -9,7 +9,7 @@ import type { AppUser } from '@/types'
 type User = AppUser
 
 interface LoginProps {
-  onLogin: (user: User) => void
+  onLogin?: (user: User) => void
 }
 
 const demoUsers: User[] = [
@@ -42,8 +42,10 @@ export default function Login({ onLogin }: LoginProps) {
       
       if (response.ok) {
         localStorage.setItem('token', data.token)
+        localStorage.setItem('cmdi_token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
-        onLogin(data.user)
+        localStorage.setItem('cmdi_user', JSON.stringify(data.user))
+        onLogin?.(data.user)
       } else {
         setError(data.error || 'Invalid credentials')
       }
@@ -51,7 +53,8 @@ export default function Login({ onLogin }: LoginProps) {
       // Fallback to demo mode if server is not running
       const foundUser = demoUsers.find(u => u.user_id === userId)
       if (foundUser && password === 'demo123') {
-        onLogin(foundUser)
+        localStorage.setItem('cmdi_user', JSON.stringify(foundUser))
+        onLogin?.(foundUser)
       } else {
         setError('Invalid credentials. Use demo user IDs with password "demo123"')
       }
@@ -62,7 +65,8 @@ export default function Login({ onLogin }: LoginProps) {
   const handleDemoLogin = (demoUser: User) => {
     setLoading(true)
     setTimeout(() => {
-      onLogin(demoUser)
+      localStorage.setItem('cmdi_user', JSON.stringify(demoUser))
+      onLogin?.(demoUser)
       setLoading(false)
     }, 500)
   }

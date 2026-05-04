@@ -224,6 +224,122 @@ app.post('/api/approve-enrollment', async (req, res) => {
   }
 });
 
+// Submit assignment
+app.post('/api/submit-assignment', async (req, res) => {
+  try {
+    const { studentId, assignmentId, content } = req.body;
+    const userId = JSON.parse(localStorage.getItem('cmdi_user') || '{}').user_id || studentId;
+    
+    await query(
+      'INSERT INTO submissions (student_id, assignment_id, content, submitted_at, status) VALUES (?, ?, ?, NOW(), "submitted")',
+      [userId, assignmentId, content]
+    );
+    
+    // Create notification
+    await query(
+      'INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?, "submission", "Assignment Submitted", "Your assignment has been submitted successfully", NOW())',
+      [userId]
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Submit evaluation (grades)
+app.post('/api/submit-evaluation', async (req, res) => {
+  try {
+    const { studentId, courseCode, midterm, finals, feedback } = req.body;
+    
+    // Get course ID from code
+    const courses = await query('SELECT id FROM courses WHERE course_code = ?', [courseCode]);
+    if (courses.length === 0) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    
+    const courseId = courses[0].id;
+    
+    // Update or insert grade
+    const existing = await query(
+      'SELECT * FROM grades WHERE student_id = ? AND course_id = ?',
+      [studentId, courseId]
+    );
+    
+    if (existing.length > 0) {
+      await query(
+        'UPDATE grades SET midterm = ?, finals = ?, feedback = ? WHERE student_id = ? AND course_id = ?',
+        [midterm, finals, feedback, studentId, courseId]
+      );
+    } else {
+      await query(
+        'INSERT INTO grades (student_id, course_id, midterm, finals, feedback) VALUES (?, ?, ?, ?, ?)',
+        [studentId, courseId, midterm, finals, feedback]
+      );
+    }
+    
+    // Create notification for student
+    await query(
+      'INSERT INTO notifications (user_id, type, title, message, created_at) VALUES (?, "grade", "Grades Posted", "Your grades for ' + courseCode + ' have been posted", NOW())',
+      [studentId]
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get notifications
+app.get('/api/notifications', async (req, res) => {
+  try {
+    const userId = req.headers.authorization?.split(' ')[1]; // Get from token
+    const user = JSON.parse(localStorage.getItem('cmdi_user') || '{}');
+    
+    const notifications = await query(
+      'SELECT * FROM notifications WHERE user_id = ? OR user_id IS NULL ORDER BY created_at DESC LIMIT 20',
+      [user.user_id]
+    );
+    
+    res.json(notifications);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Mark notification as read
+app.put('/api/notifications/:id/read', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await query("UPDATE notifications SET read = 1 WHERE id = ?", [id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Mark all notifications as read
+app.put('/api/notifications/read-all', async (req, res) => {
+  try {
+    const user = JSON.parse(localStorage.getItem('cmdi_user') || '{}');
+    await query("UPDATE notifications SET read = 1 WHERE user_id = ?", [user.user_id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Delete notification
+app.delete('/api/notifications/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await query("DELETE FROM notifications WHERE id = ?", [id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

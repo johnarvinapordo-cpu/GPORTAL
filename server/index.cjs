@@ -125,24 +125,33 @@ app.get("/api/students", asyncRoute(async (_req, res) => {
 app.get("/api/student/:userId", asyncRoute(async (req, res) => {
   const { userId } = req.params;
   const [user] = await query("SELECT id, user_id, name, email, role FROM users WHERE user_id = ?", [userId]);
-  const [student] = await query("SELECT * FROM students WHERE user_id = ?", [userId]);
+
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  const [student] = await query("SELECT * FROM students WHERE student_id = ?", [user.id]);
+
+  // Get enrolled courses
   const courses = await query(`
-    SELECT c.*, u.name AS instructor_name, e.status AS enrollment_status
-    FROM courses c
-    JOIN enrollments e ON c.id = e.course_id
-    LEFT JOIN users u ON u.user_id = c.instructor_id
-    WHERE e.student_id = ? AND e.status = 'approved'
+    SELECT e.*, c.course_code, c.course_name, c.description
+    FROM enrollment e
+    JOIN courses c ON c.course_id = e.course_id
+    WHERE e.student_id = ? AND e.status = 'enrolled'
     ORDER BY c.course_code
-  `, [userId]);
+  `, [user.id]);
+
+  // Get grades
   const grades = await query(`
-    SELECT c.course_code, c.title, g.midterm, g.finals,
-      ROUND(((COALESCE(g.midterm, 0) + COALESCE(g.finals, 0)) / 2), 2) AS average
+    SELECT c.course_code, c.course_name, g.grade, g.semester, g.year
     FROM grades g
-    JOIN courses c ON g.course_id = c.id
+    JOIN courses c ON g.course_id = c.course_id
     WHERE g.student_id = ?
     ORDER BY c.course_code
-  `, [userId]);
-  const payments = await query("SELECT * FROM payments WHERE student_id = ? ORDER BY due_date DESC", [userId]);
+  `, [user.id]);
+
+  // Get payments
+  const payments = await query("SELECT * FROM tuition_payments WHERE student_id = ? ORDER BY payment_date DESC", [user.id]);
 
   res.json({ user: user || {}, student: student || {}, courses, grades, payments });
 }));
@@ -234,11 +243,36 @@ app.get("/api/finance", asyncRoute(async (_req, res) => {
 }));
 
 app.post("/api/enroll", asyncRoute(async (req, res) => {
-  const { studentId, courseId } = req.body;
-  await query(
-    "INSERT INTO enrollments (student_id, course_id, status) VALUES (?, ?, 'pending')",
-    [studentId, Number(courseId)]
+  const { studentId, courseCode } = req.body;
+
+  // Get user ID from user_id
+  const [user] = await query("SELECT id FROM users WHERE user_id = ?", [studentId]);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  // Get course ID from course code
+  const [course] = await query("SELECT course_id FROM courses WHERE course_code = ?", [courseCode]);
+  if (!course) {
+    return res.status(404).json({ error: "Course not found" });
+  }
+
+  // Check if already enrolled
+  const [existing] = await query(
+    "SELECT enrollment_id FROM enrollment WHERE student_id = ? AND course_id = ?",
+    [user.id, course.course_id]
   );
+
+  if (existing) {
+    return res.status(400).json({ error: "Already enrolled in this course" });
+  }
+
+  // Create enrollment
+  await query(
+    "INSERT INTO enrollment (student_id, course_id, semester, year, enrollment_date, status) VALUES (?, ?, '1st', 2026, CURDATE(), 'enrolled')",
+    [user.id, course.course_id]
+  );
+
   res.status(201).json({ success: true });
 }));
 
@@ -248,12 +282,25 @@ app.post("/api/approve-enrollment", asyncRoute(async (req, res) => {
 }));
 
 app.post("/api/grade", asyncRoute(async (req, res) => {
-  const { studentId, courseId, midterm, finals } = req.body;
+  const { studentId, courseCode, grade } = req.body;
+
+  // Get user ID from user_id
+  const [user] = await query("SELECT id FROM users WHERE user_id = ?", [studentId]);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  // Get course ID from course code
+  const [course] = await query("SELECT course_id FROM courses WHERE course_code = ?", [courseCode]);
+  if (!course) {
+    return res.status(404).json({ error: "Course not found" });
+  }
+
   await query(`
-    INSERT INTO grades (student_id, course_id, midterm, finals)
-    VALUES (?, ?, ?, ?)
-    ON DUPLICATE KEY UPDATE midterm = VALUES(midterm), finals = VALUES(finals)
-  `, [studentId, Number(courseId), midterm, finals]);
+    INSERT INTO grades (student_id, course_id, grade, semester, year)
+    VALUES (?, ?, ?, '1st', 2026)
+    ON DUPLICATE KEY UPDATE grade = VALUES(grade)
+  `, [user.id, course.course_id, grade]);
   res.json({ success: true });
 }));
 
@@ -270,6 +317,60 @@ app.post("/api/payment", asyncRoute(async (req, res) => {
     WHERE student_id = ?
   `, [Number(amount), Number(amount), Number(amount), studentId]);
   res.json({ success: true });
+}));
+
+app.post("/api/evaluation", asyncRoute(async (req, res) => {
+  const { courseCode, ratings, comments } = req.body;
+
+  // Get course ID from course code
+  const [course] = await query("SELECT course_id FROM courses WHERE course_code = ?", [courseCode]);
+  if (!course) {
+    return res.status(404).json({ error: "Course not found" });
+  }
+
+  // Calculate average rating
+  const ratingValues = Object.values(ratings);
+  const averageRating = ratingValues.reduce((sum, rating) => sum + Number(rating), 0) / ratingValues.length;
+
+  // For now, just return success (we can add an evaluations table later if needed)
+  console.log(`Evaluation submitted for ${courseCode}:`, { ratings, comments, averageRating });
+
+  res.json({ success: true, averageRating });
+}));
+
+app.get("/api/notifications", asyncRoute(async (req, res) => {
+  // Get user from token
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    const userId = decoded.user_id;
+    const userRole = decoded.role;
+
+    // Get notifications based on role
+    let notifications = [];
+
+    if (userRole === 'student') {
+      notifications = [
+        { id: 1, title: "Midterm Examination Schedule", message: "Office of Academic Affairs • March 15, 2026", status: "Unread", type: "academic" },
+        { id: 2, title: "Enrollment for Summer Classes Now Open", message: "Registrar Office • March 10, 2026", status: "New", type: "enrollment" },
+        { id: 3, title: "Library Operating Hours Update", message: "Library Services • March 8, 2026", status: "Read", type: "general" },
+      ];
+    } else if (userRole === 'teacher') {
+      notifications = [
+        { id: 1, title: "Faculty Meeting - March 20", message: "Dean's Office • Conference Room A", status: "Unread", type: "meeting" },
+        { id: 2, title: "Grade Submission Deadline Reminder", message: "Registrar Office • Due March 28, 2026", status: "Due Soon", type: "deadline" },
+        { id: 3, title: "Professional Development Workshop", message: "HR Department • April 5, 2026", status: "Read", type: "training" },
+      ];
+    }
+
+    res.json({ notifications });
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
 }));
 
 const PORT = Number(process.env.PORT || 3001);

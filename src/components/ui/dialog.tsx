@@ -43,13 +43,26 @@ export function useDialog() {
   return React.useContext(DialogContext);
 }
 
-export function DialogTrigger({ children }: { children: React.ReactNode }) {
-  const { onOpenChange } = useDialog();
-  return (
-    <div onClick={() => onOpenChange(true)}>
-      {children}
-    </div>
-  );
+export function DialogTrigger({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) {
+  const { onOpenChange } = useDialog()
+
+  const handleClick = (event: React.MouseEvent) => {
+    onOpenChange(true)
+    if (React.isValidElement(children)) {
+      const originalOnClick = (children.props as any).onClick
+      if (typeof originalOnClick === 'function') {
+        originalOnClick(event)
+      }
+    }
+  }
+
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children, {
+      onClick: handleClick,
+    })
+  }
+
+  return <div onClick={handleClick}>{children}</div>
 }
 
 export function DialogContent({ className, children }: { className?: string; children: React.ReactNode }) {

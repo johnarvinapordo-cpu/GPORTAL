@@ -1,12 +1,10 @@
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
+import type { AppUser } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { 
   Users, 
   BookOpen, 
   ClipboardCheck, 
-  Clock, 
-  GraduationCap,
   MessageSquare
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -20,21 +18,23 @@ import {
     TableRow 
 } from '@/components/ui/table';
 
+interface TeacherDashboardProps {
+  user: Extract<AppUser, { role: 'teacher' }>
+}
+
 const classes = [
   { id: 'CS101', name: 'Intro to Programming', students: 42, lastGraded: '2 days ago', status: 'In Progress' },
   { id: 'CS202', name: 'Database Systems', students: 35, lastGraded: '5 days ago', status: 'Grading' },
   { id: 'MATH301', name: 'Discrete Math', students: 28, lastGraded: 'Today', status: 'Completed' },
 ];
 
-const TeacherDashboard: React.FC = () => {
-  const { profile } = useAuth();
-
+const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ user }) => {
   return (
     <div className="space-y-6 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Teacher Console</h1>
-          <p className="text-muted-foreground">Welcome, Professor {profile?.name}. Manage your classes and grades.</p>
+          <p className="text-muted-foreground">Welcome, Professor {user.name}. Manage your classes and grades.</p>
         </div>
         <div className="flex items-center gap-3">
             <Button variant="outline" size="sm" className="bg-card">Schedule Meeting</Button>
