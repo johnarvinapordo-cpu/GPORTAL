@@ -42,6 +42,7 @@ function App() {
     localStorage.removeItem('cmdi_user')
     localStorage.removeItem('cmdi_token')
     localStorage.removeItem('user')
+    localStorage.removeItem('token')
   }
 
   if (loading) {

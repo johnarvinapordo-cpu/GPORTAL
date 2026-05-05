@@ -32,7 +32,7 @@ export default function Login({ onLogin }: LoginProps) {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('http://localhost:3001/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, password })
@@ -45,6 +45,9 @@ export default function Login({ onLogin }: LoginProps) {
         localStorage.setItem('cmdi_token', data.token)
         localStorage.setItem('user', JSON.stringify(data.user))
         localStorage.setItem('cmdi_user', JSON.stringify(data.user))
+        setUserId('')
+        setPassword('')
+        setError('')
         onLogin?.(data.user)
       } else {
         setError(data.error || 'Invalid credentials')
@@ -54,6 +57,9 @@ export default function Login({ onLogin }: LoginProps) {
       const foundUser = demoUsers.find(u => u.user_id === userId)
       if (foundUser && password === 'demo123') {
         localStorage.setItem('cmdi_user', JSON.stringify(foundUser))
+        setUserId('')
+        setPassword('')
+        setError('')
         onLogin?.(foundUser)
       } else {
         setError('Invalid credentials. Use demo user IDs with password "demo123"')

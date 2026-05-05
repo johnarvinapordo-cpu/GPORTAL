@@ -1,0 +1,1 @@
+# Backend Server Setup - Task Progress\n\n## Steps:\n1. [x] Create server.js with express.json() middleware and /api/login route with try/catch\n2. [ ] Install dependencies (express, cors)\n3. [ ] Test server startup\n4. [ ] Update TODO on completion\n\n**Next:** Run `npm init -y && npm install express cors` then `node server.js`.

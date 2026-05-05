@@ -8,6 +8,7 @@
     "dev:server": "concurrently \"vite\" \"node server/index.cjs\"",
     "server": "node server/index.cjs",
     "db:setup": "node server/setup-db.cjs",
+    "db:create-user": "node server/create-app-user.cjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "start": "concurrently \"vite\" \"node server/index.cjs\""
@@ -20,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^4.22.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.303.0",
