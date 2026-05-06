@@ -1,173 +1,164 @@
-import { useState } from 'react'
-import { GraduationCap } from 'lucide-react'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import type { AppUser } from '@/types'
-
-type User = AppUser
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GraduationCap } from "lucide-react";
+import type { AppUser } from "../types";
 
 interface LoginProps {
-  onLogin?: (user: User) => void
+  onLogin?: (user: AppUser) => void;
 }
 
-const demoUsers: User[] = [
-  { id: 1, user_id: 'STU-001', name: 'Juan Dela Cruz', email: 'juan@cmdi.edu', role: 'student' },
-  { id: 2, user_id: 'TCH-001', name: 'Maria Santos', email: 'maria@cmdi.edu', role: 'teacher' },
-  { id: 3, user_id: 'ADM-001', name: 'Admin User', email: 'admin@cmdi.edu', role: 'admin' },
-  { id: 4, user_id: 'REG-001', name: 'Registrar User', email: 'registrar@cmdi.edu', role: 'registrar' },
-  { id: 5, user_id: 'FIN-001', name: 'Finance User', email: 'finance@cmdi.edu', role: 'finance' },
-]
-
 export default function Login({ onLogin }: LoginProps) {
-  const [userId, setUserId] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+
+  const [userId, setUserId] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+
+    if (!userId || !password) return;
+
+    setError("");
+    setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password })
-      })
-      
-      const data = await response.json()
-      
-      if (response.ok) {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('cmdi_token', data.token)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        localStorage.setItem('cmdi_user', JSON.stringify(data.user))
-        setUserId('')
-        setPassword('')
-        setError('')
-        onLogin?.(data.user)
-      } else {
-        setError(data.error || 'Invalid credentials')
+      const res = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed");
       }
-    } catch (err) {
-      // Fallback to demo mode if server is not running
-      const foundUser = demoUsers.find(u => u.user_id === userId)
-      if (foundUser && password === 'demo123') {
-        localStorage.setItem('cmdi_user', JSON.stringify(foundUser))
-        setUserId('')
-        setPassword('')
-        setError('')
-        onLogin?.(foundUser)
+
+      const user = data.user;
+
+      // ✅ CONSISTENT STORAGE (IMPORTANT FIX)
+      localStorage.setItem("cmdi_user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("cmdi_token", data.token);
+
+      setUserId("");
+      setPassword("");
+
+      // ✅ notify App
+      onLogin?.(user);
+
+      // ✅ redirect based on role
+      navigate(`/${user.role}`);
+
+    } catch (err: any) {
+      // fallback demo login
+      if (password === "demo123") {
+        const rolePrefix = userId.split("-")[0];
+
+        let role: AppUser['role'] = "student";
+        if (rolePrefix === "TCH") role = "teacher";
+        else if (rolePrefix === "ADM") role = "admin";
+        else if (rolePrefix === "REG") role = "registrar";
+        else if (rolePrefix === "FIN") role = "finance";
+
+        const demoUser: AppUser = {
+          id: 0,
+          user_id: userId,
+          name: "Demo User",
+          email: "",
+          role,
+        };
+
+        localStorage.setItem("cmdi_user", JSON.stringify(demoUser));
+        localStorage.setItem("user", JSON.stringify(demoUser));
+
+        onLogin?.(demoUser);
+
+        navigate(`/${role}`);
       } else {
-        setError('Invalid credentials. Use demo user IDs with password "demo123"')
+        setError(err.message);
       }
     }
-    setLoading(false)
-  }
 
-  const handleDemoLogin = (demoUser: User) => {
-    setLoading(true)
-    setTimeout(() => {
-      localStorage.setItem('cmdi_user', JSON.stringify(demoUser))
-      onLogin?.(demoUser)
-      setLoading(false)
-    }, 500)
-  }
+    setLoading(false);
+  };
 
-return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#162d6f] via-[#2563eb] to-[#7dd3fc] p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 mb-4">
-            <GraduationCap className="w-8 h-8 text-white" />
+
+        <div className="mb-7 text-center">
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-xl">
+            <GraduationCap className="h-12 w-12 text-[#1e3a8a]" />
           </div>
-          <h1 className="text-3xl font-bold text-white">CMDI Grade Portal</h1>
-          <p className="text-blue-400 mt-2">Sign in to your account</p>
+          <h1 className="mb-2 text-3xl font-bold text-white">CMDI Grade Portal</h1>
+          <p className="text-blue-100">CARD-MRI Development Institute Inc.</p>
         </div>
 
-        <Card className="bg-slate-900 rounded-xl border border-blue-900/30 shadow-lg">
-          <CardContent className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* User ID Input */}
-              <div className="space-y-2">
-                <Label htmlFor="userId" className="text-blue-300">User ID</Label>
-                <Input
-                  id="userId"
-                  type="text"
-                  placeholder="Enter your User ID"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  className="bg-slate-800 border-blue-900/30 text-white placeholder:text-blue-400/50"
-                  required
-                />
-              </div>
+        <div className="overflow-hidden rounded-lg bg-white shadow-2xl">
 
-              {/* Password Input */}
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-blue-300">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="bg-slate-800 border-blue-900/30 text-white placeholder:text-blue-400/50"
-                  required
-                />
-              </div>
+          <div className="p-6 border-b text-center">
+            <h2 className="text-xl font-semibold">Login</h2>
+          </div>
 
-              {/* Remember Me & Forgot Password */}
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded border-blue-900/30 bg-slate-800" />
-                  <span className="text-blue-300">Remember me</span>
-                </label>
-                <a href="#" className="text-blue-400 hover:underline">
-                  Forgot password?
-                </a>
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4 p-6">
 
-              {/* Error Message */}
-              {error && (
-                <div className="p-3 rounded-lg bg-red-900/20 text-red-400 text-sm border border-red-900/30">
-                  {error}
-                </div>
-              )}
+            <input
+              type="text"
+              value={userId}
+              onChange={(e) => setUserId(e.target.value)}
+              placeholder="STU-001"
+              className="w-full border px-3 py-2 rounded"
+              required
+            />
 
-              {/* Submit Button */}
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                {loading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="demo123"
+              className="w-full border px-3 py-2 rounded"
+              required
+            />
 
-            {/* Demo Accounts Section */}
-            <div className="mt-6 p-4 rounded-xl bg-slate-800/50 border border-blue-900/30">
-              <p className="text-sm font-medium mb-3 text-blue-300">Demo Accounts:</p>
-              <div className="grid grid-cols-1 gap-2">
-                {demoUsers.map((user) => (
-                  <button
-                    key={user.id}
-                    onClick={() => handleDemoLogin(user)}
-                    disabled={loading}
-                    className="flex items-center justify-between p-2 rounded-lg bg-slate-900 border border-blue-900/20 hover:bg-slate-800 transition-colors text-sm"
-                  >
-                    <span className="text-white">{user.name}</span>
-                    <span className="text-blue-400 capitalize">{user.role}</span>
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-blue-400/70 mt-2 text-center">Password: demo123</p>
+            {error && (
+              <div className="text-red-500 text-sm">{error}</div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white py-2 rounded"
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              {["STU-001", "TCH-001", "ADM-001", "REG-001", "FIN-001"].map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    setUserId(id);
+                    setPassword("demo123");
+                    setError("");
+                  }}
+                  className="border p-1 rounded hover:bg-gray-100"
+                >
+                  {id}
+                </button>
+              ))}
             </div>
-          </CardContent>
-        </Card>
 
-        <p className="text-center text-sm text-blue-400/70 mt-6">
-          © 2026 CARD-MRI Development Institute Inc. All rights reserved.
-        </p>
+            <p className="text-xs text-center">Password: demo123</p>
+          </form>
+        </div>
       </div>
     </div>
-  )
+  );
 }

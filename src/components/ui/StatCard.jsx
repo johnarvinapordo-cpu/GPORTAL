@@ -1,3 +1,4 @@
+// @ts-nocheck
 export default function StatCard({ title, value, icon, helper, tone = "primary" }) {
   const valueTone = {
     primary: "text-primary",

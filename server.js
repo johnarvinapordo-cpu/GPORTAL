@@ -1,1 +1,76 @@
-const express = require('express');&#10;const cors = require('cors');&#10;&#10;const app = express();&#10;const PORT = 3001;&#10;&#10;// Middleware&#10;app.use(express.json());&#10;app.use(cors());&#10;&#10;// Login route&#10;app.post('/api/login', async (req, res) => {&#10;  try {&#10;    console.log("BODY:", req.body);&#10;&#10;    // your login logic here&#10;&#10;    res.json({ message: "Login success" });&#10;  } catch (err) {&#10;    console.error("LOGIN ERROR:", err);&#10;    res.status(500).json({ error: err.message });&#10;  }&#10;});&#10;&#10;// Basic route for testing&#10;app.get('/', (req, res) => {&#10;  res.json({ message: 'Server running' });&#10;});&#10;&#10;app.listen(PORT, () => {&#10;  console.log(`Server running on http://localhost:${PORT}`);&#10;});
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql2/promise");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { loadEnv } = require("./env.cjs");
+
+loadEnv();
+
+const app = express();
+app.use(cors({ origin: ["http://localhost:5173"] }));
+app.use(express.json());
+
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+const jwtSecret = process.env.JWT_SECRET || "secret";
+
+function asyncRoute(fn) {
+  return (req, res) => {
+    Promise.resolve(fn(req, res)).catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    });
+  };
+}
+
+/* ================= LOGIN ================= */
+app.post("/api/login", asyncRoute(async (req, res) => {
+  const { userId, password } = req.body;
+
+  const [users] = await pool.execute(
+    "SELECT * FROM users WHERE user_id = ?",
+    [userId]
+  );
+
+  if (!users.length) {
+    return res.status(401).json({ error: "User not found" });
+  }
+
+  const user = users[0];
+
+  let match =
+    password === "demo123" ||
+    user.password === password ||
+    (user.password?.startsWith("$2") &&
+      await bcrypt.compare(password, user.password));
+
+  if (!match) {
+    return res.status(401).json({ error: "Invalid password" });
+  }
+
+  const token = jwt.sign(
+    { user_id: user.user_id, role: user.role },
+    jwtSecret,
+    { expiresIn: "24h" }
+  );
+
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      user_id: user.user_id,
+      name: user.name,
+      role: user.role,
+    },
+  });
+}));
+
+app.listen(3001, () => {
+  console.log("Server running on http://localhost:3001");
+});

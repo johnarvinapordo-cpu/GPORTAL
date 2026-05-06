@@ -15,9 +15,17 @@ interface StoredUser {
   role: UserRole
 }
 
-const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface DashboardLayoutProps {
+  children: React.ReactNode
+  userRole?: UserRole
+  userName?: string
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, userRole, userName }) => {
   const [storedUser, setStoredUser] = useState<StoredUser | null>(null)
   const location = useLocation()
+  const displayRole = userRole ?? storedUser?.role
+  const displayName = userName ?? storedUser?.name
 
   useEffect(() => {
     const stored = localStorage.getItem('cmdi_user') || localStorage.getItem('user')
@@ -30,7 +38,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
     }
   }, [])
 
-  if (!storedUser) {
+  if (!displayRole || !displayName) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
         <div>Loading...</div>
@@ -39,35 +47,33 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
   }
 
   const menuItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: `/${storedUser.role}/dashboard` },
-    ...(storedUser.role === 'student'
+    { label: 'Dashboard', icon: LayoutDashboard, path: `/${displayRole}/dashboard` },
+    ...(displayRole === 'student'
       ? [
           { label: 'Enroll', icon: BookOpen, path: '/student/enrollment' },
           { label: 'Grades', icon: GraduationCap, path: '/student/grades' },
           { label: 'Finance', icon: CreditCard, path: '/student/finance' },
         ]
       : []),
-    ...(storedUser.role === 'teacher'
+    ...(displayRole === 'teacher'
       ? [
-          { label: 'Classes', icon: BookOpen, path: '/teacher/classes' },
-          { label: 'Students', icon: Users, path: '/teacher/students' },
-          { label: 'Grades', icon: GraduationCap, path: '/teacher/grades' },
+          { label: 'Grades', icon: GraduationCap, path: '/teacher/evaluations' },
         ]
       : []),
-    ...(storedUser.role === 'admin'
+    ...(displayRole === 'admin'
       ? [
           { label: 'Users', icon: Users, path: '/admin/users' },
           { label: 'Analytics', icon: LayoutDashboard, path: '/admin/analytics' },
           { label: 'Reports', icon: CreditCard, path: '/admin/reports' },
         ]
       : []),
-    ...(storedUser.role === 'registrar'
+    ...(displayRole === 'registrar'
       ? [
           { label: 'Enrollments', icon: Calendar, path: '/registrar/enrollment' },
           { label: 'Records', icon: Users, path: '/registrar/records' },
         ]
       : []),
-    ...(storedUser.role === 'finance'
+    ...(displayRole === 'finance'
       ? [
           { label: 'Payments', icon: CreditCard, path: '/finance/payments' },
           { label: 'Reports', icon: LayoutDashboard, path: '/finance/reports' },
@@ -88,7 +94,7 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
       <aside className="w-64 bg-card border-r border-border fixed h-screen flex flex-col">
         <div className="p-6 border-b border-border">
           <h2 className="text-xl font-bold text-primary">CMDI Portal</h2>
-          <p className="text-xs text-muted-foreground capitalize">{storedUser.role} Dashboard</p>
+          <p className="text-xs text-muted-foreground capitalize">{displayRole} Dashboard</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -115,8 +121,8 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) 
               <Avatar className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <p className="text-sm font-medium">{storedUser.name}</p>
-              <p className="text-xs text-muted-foreground capitalize">{storedUser.role}</p>
+              <p className="text-sm font-medium">{displayName}</p>
+              <p className="text-xs text-muted-foreground capitalize">{displayRole}</p>
             </div>
           </div>
           <Button variant="ghost" className="w-full justify-start text-muted-foreground" onClick={handleLogout}>

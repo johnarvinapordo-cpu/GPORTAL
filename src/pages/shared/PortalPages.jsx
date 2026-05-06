@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ⚠️ SAME IMPORTS (unchanged)
 import { useMemo, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -12,7 +13,7 @@ import {
   Search, Send, Star, Users
 } from "lucide-react";
 
-import DashboardLayout from "../../components/layout/DashboardLayout";
+import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";

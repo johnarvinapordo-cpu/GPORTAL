@@ -34,11 +34,15 @@ const stats = {
   pendingPayments: 3,
 }
 
-export default function FinanceDashboard({ user }: { user: User }) {
+export default function FinanceDashboard({ user }: { user?: User }) {
+  const userName = user?.name || "Finance Officer"
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Welcome, Finance Officer {user.name.split(' ').pop()}!</h1>
+        <h1 className="text-2xl font-bold">
+          Welcome, Finance Officer {userName.split(' ').pop()}!
+        </h1>
         <p className="text-muted-foreground">Manage payments and financial reports</p>
       </div>
 
@@ -52,6 +56,7 @@ export default function FinanceDashboard({ user }: { user: User }) {
             <DollarSign className="w-8 h-8 text-primary" />
           </div>
         </div>
+
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -61,6 +66,7 @@ export default function FinanceDashboard({ user }: { user: User }) {
             <CreditCard className="w-8 h-8 text-green-600" />
           </div>
         </div>
+
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -70,6 +76,7 @@ export default function FinanceDashboard({ user }: { user: User }) {
             <TrendingUp className="w-8 h-8 text-red-600" />
           </div>
         </div>
+
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -102,9 +109,11 @@ export default function FinanceDashboard({ user }: { user: User }) {
                     <td className="text-right p-2">₱{payment.paid.toLocaleString()}</td>
                     <td className="text-center p-2">
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        payment.status === 'Paid' ? 'bg-green-100 text-green-800' :
-                        payment.status === 'Partial' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                        payment.status === 'Paid'
+                          ? 'bg-green-100 text-green-800'
+                          : payment.status === 'Partial'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
                       }`}>
                         {payment.status}
                       </span>
@@ -124,22 +133,25 @@ export default function FinanceDashboard({ user }: { user: User }) {
               <p className="font-medium">View Receipts</p>
               <p className="text-xs text-muted-foreground">Generate payment receipts</p>
             </button>
+
             <button className="p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-left">
               <CreditCard className="w-6 h-6 mb-2" />
               <p className="font-medium">Record Payment</p>
               <p className="text-xs text-muted-foreground">Add new payment</p>
             </button>
+
             <button className="p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-left">
               <TrendingUp className="w-6 h-6 mb-2" />
               <p className="font-medium">Financial Reports</p>
               <p className="text-xs text-muted-foreground">Generate reports</p>
             </button>
+
             <button className="p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-left">
               <DollarSign className="w-6 h-6 mb-2" />
               <p className="font-medium">Send Reminders</p>
               <p className="text-xs text-muted-foreground">Payment reminders</p>
             </button>
-</div>
+          </div>
         </div>
       </div>
 
