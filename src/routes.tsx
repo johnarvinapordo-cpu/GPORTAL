@@ -1,6 +1,7 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
+
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -24,112 +25,104 @@ import RegistrarStudentRecordsPage from "./pages/RegistrarStudentRecordsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ProfilePage from "./pages/ProfilePage";
 
+
+// 🔐 simple auth guard
+const getUser = () => JSON.parse(localStorage.getItem("user") || "null");
+
+const ProtectedRoute = ({ children, role }: any) => {
+  const user = getUser();
+
+  if (!user) return <Navigate to="/" replace />;
+
+  // prevent wrong role access (THIS fixes bouncing issue)
+  if (role && user.role !== role) {
+    return <Navigate to={`/${user.role}`} replace />;
+  }
+
+  return children;
+};
+
 export const router = createBrowserRouter([
+  // LOGIN
   {
     path: "/",
-    Component: LoginPage,
+    element: <LoginPage />,
   },
 
   // STUDENT
   {
     path: "/student",
-    Component: StudentDashboard,
+    element: (
+      <ProtectedRoute role="student">
+        <StudentDashboard />
+      </ProtectedRoute>
+    ),
   },
-  {
-    path: "/student/enrollment",
-    Component: EnrollmentPage,
-  },
-  {
-    path: "/student/grades",
-    Component: GradesPage,
-  },
-  {
-    path: "/student/tuition",
-    Component: TuitionPage,
-  },
-  {
-    path: "/student/evaluation",
-    Component: EvaluationPage,
-  },
+  { path: "/student/enrollment", element: <EnrollmentPage /> },
+  { path: "/student/grades", element: <GradesPage /> },
+  { path: "/student/tuition", element: <TuitionPage /> },
+  { path: "/student/evaluation", element: <EvaluationPage /> },
 
   // TEACHER
   {
     path: "/teacher",
-    Component: TeacherDashboard,
+    element: (
+      <ProtectedRoute role="teacher">
+        <TeacherDashboard />
+      </ProtectedRoute>
+    ),
   },
-  {
-    path: "/teacher/courses",
-    Component: CourseManagementPage,
-  },
-  {
-    path: "/teacher/grades",
-    Component: GradesPage,
-  },
-  {
-    path: "/teacher/students",
-    Component: StudentListPage,
-  },
-  {
-    path: "/teacher/evaluation",
-    Component: EvaluationPage,
-  },
+  { path: "/teacher/courses", element: <CourseManagementPage /> },
+  { path: "/teacher/grades", element: <GradesPage /> },
+  { path: "/teacher/students", element: <StudentListPage /> },
+  { path: "/teacher/evaluation", element: <EvaluationPage /> },
 
   // ADMIN
   {
     path: "/admin",
-    Component: AdminDashboard,
+    element: (
+      <ProtectedRoute role="admin">
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
   },
-  {
-    path: "/admin/analytics",
-    Component: AnalyticsPage,
-  },
-  {
-    path: "/admin/students",
-    Component: StudentListPage,
-  },
-  {
-    path: "/admin/courses",
-    Component: CourseManagementPage,
-  },
-  {
-    path: "/admin/enrollment",
-    Component: EnrollmentPage,
-  },
-  {
-    path: "/admin/grades",
-    Component: GradesPage,
-  },
-  {
-    path: "/admin/financial",
-    Component: TuitionPage,
-  },
+  { path: "/admin/analytics", element: <AnalyticsPage /> },
+  { path: "/admin/students", element: <StudentListPage /> },
+  { path: "/admin/courses", element: <CourseManagementPage /> },
+  { path: "/admin/enrollment", element: <EnrollmentPage /> },
+  { path: "/admin/grades", element: <GradesPage /> },
+  { path: "/admin/financial", element: <TuitionPage /> },
 
   // FINANCE
   {
     path: "/finance",
-    Component: FinanceDashboard,
+    element: (
+      <ProtectedRoute role="finance">
+        <FinanceDashboard />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/finance/students",
-    Component: FinanceStudentAccountsPage,
+    element: <FinanceStudentAccountsPage />,
   },
   {
     path: "/finance/payments",
-    Component: FinancePaymentsBillingPage,
+    element: <FinancePaymentsBillingPage />,
   },
   {
     path: "/finance/reports",
-    Component: FinanceReportsPage,
+    element: <FinanceReportsPage />,
   },
   {
     path: "/finance/notifications",
-    Component: () => (
+    element: (
       <NotificationsPage userRole="finance" userName="Finance Officer" />
     ),
   },
   {
     path: "/finance/profile",
-    Component: () => (
+    element: (
       <ProfilePage userRole="finance" userName="Finance Officer" />
     ),
   },
@@ -137,34 +130,44 @@ export const router = createBrowserRouter([
   // REGISTRAR
   {
     path: "/registrar",
-    Component: RegistrarDashboard,
+    element: (
+      <ProtectedRoute role="registrar">
+        <RegistrarDashboard />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/registrar/students",
-    Component: RegistrarStudentRecordsPage,
+    element: <RegistrarStudentRecordsPage />,
   },
   {
     path: "/registrar/enrollment",
-    Component: EnrollmentPage,
+    element: <EnrollmentPage />,
   },
   {
     path: "/registrar/grades",
-    Component: GradesPage,
+    element: <GradesPage />,
   },
   {
     path: "/registrar/courses",
-    Component: CourseManagementPage,
+    element: <CourseManagementPage />,
   },
   {
     path: "/registrar/notifications",
-    Component: () => (
+    element: (
       <NotificationsPage userRole="registrar" userName="Registrar Officer" />
     ),
   },
   {
     path: "/registrar/profile",
-    Component: () => (
+    element: (
       <ProfilePage userRole="registrar" userName="Registrar Officer" />
     ),
+  },
+
+  // FALLBACK (IMPORTANT FIX)
+  {
+    path: "*",
+    element: <Navigate to="/" />,
   },
 ]);

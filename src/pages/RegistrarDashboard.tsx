@@ -1,353 +1,298 @@
+import { useState } from 'react';
 import DashboardLayout from "../components/layout/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Users, UserCheck, UserPlus, FileText, Calendar, GraduationCap, TrendingUp, ClipboardCheck } from "lucide-react";
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Button } from "../components/ui/button";
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  FileText,
+  BarChart3,
+  Settings,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Plus,
+} from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-export default function RegistrarDashboard() {
-  const registrarName = "Registrar Officer";
+interface RegistrarDashboardProps {
+  user: { role: string; name: string; id: string };
+  onLogout: () => void;
+}
 
-  const enrollmentTrendsData = [
-    { semester: "1st Sem 2024", enrolled: 1200, graduated: 250 },
-    { semester: "2nd Sem 2024", enrolled: 1250, graduated: 0 },
-    { semester: "Summer 2025", enrolled: 450, graduated: 0 },
-    { semester: "1st Sem 2025", enrolled: 1300, graduated: 280 },
-    { semester: "2nd Sem 2025", enrolled: 1350, graduated: 0 },
-    { semester: "Summer 2026", enrolled: 520, graduated: 0 },
-    { semester: "1st Sem 2026", enrolled: 1400, graduated: 0 },
+export default function RegistrarDashboard({ user, onLogout }: RegistrarDashboardProps) {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showAddSubject, setShowAddSubject] = useState(false);
+
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: 'enrollment', label: 'Enrollment', icon: <Users className="w-5 h-5" /> },
+    { id: 'subjects', label: 'Subjects', icon: <BookOpen className="w-5 h-5" /> },
+    { id: 'students', label: 'Students', icon: <FileText className="w-5 h-5" /> },
+    { id: 'reports', label: 'Reports', icon: <BarChart3 className="w-5 h-5" /> },
+    { id: 'settings', label: 'Settings', icon: <Settings className="w-5 h-5" /> },
   ];
 
-  const studentStatusData = [
-    { name: "Enrolled", value: 1400, color: "#3b82f6" },
-    { name: "On Leave", value: 85, color: "#f59e0b" },
-    { name: "Graduating", value: 320, color: "#10b981" },
-    { name: "Withdrawn", value: 45, color: "#ef4444" },
+  const enrollmentRequests = [
+    {
+      id: '2024-001',
+      name: 'Juan Dela Cruz',
+      program: 'BS Computer Science',
+      year: '2nd Year',
+      semester: '1st Semester 2025-2026',
+      status: 'Pending',
+      date: '2026-04-25',
+      units: 18,
+    },
+    {
+      id: '2024-002',
+      name: 'Maria Santos',
+      program: 'BS Accountancy',
+      year: '3rd Year',
+      semester: '1st Semester 2025-2026',
+      status: 'Pending',
+      date: '2026-04-26',
+      units: 21,
+    },
+    {
+      id: '2024-003',
+      name: 'Pedro Garcia',
+      program: 'BS Business Admin',
+      year: '1st Year',
+      semester: '1st Semester 2025-2026',
+      status: 'Approved',
+      date: '2026-04-24',
+      units: 18,
+    },
+    {
+      id: '2024-004',
+      name: 'Ana Reyes',
+      program: 'BS Psychology',
+      year: '4th Year',
+      semester: '1st Semester 2025-2026',
+      status: 'Approved',
+      date: '2026-04-23',
+      units: 15,
+    },
   ];
 
-  const enrollmentByYearLevel = [
-    { year: "1st Year", count: 450 },
-    { year: "2nd Year", count: 380 },
-    { year: "3rd Year", count: 340 },
-    { year: "4th Year", count: 230 },
+  const subjects = [
+    { code: 'MTH101', name: 'Mathematics 101', units: 3, instructor: 'Prof. Maria Santos', slots: 35 },
+    { code: 'ENG101', name: 'English Communication', units: 3, instructor: 'Prof. John Reyes', slots: 40 },
+    { code: 'HIS101', name: 'Philippine History', units: 3, instructor: 'Prof. Ana Cruz', slots: 38 },
+    { code: 'CS101', name: 'Computer Science 101', units: 4, instructor: 'Prof. Carlos Tan', slots: 30 },
+    { code: 'PE101', name: 'Physical Education', units: 2, instructor: 'Coach Mike Lopez', slots: 45 },
   ];
 
-  const programEnrollmentData = [
-    { program: "Computer Science", students: 450, capacity: 500 },
-    { program: "Business Admin", students: 380, capacity: 400 },
-    { program: "Engineering", students: 320, capacity: 350 },
-    { program: "Education", students: 250, capacity: 300 },
+  const students = [
+    { id: '2024-001', name: 'Juan Dela Cruz', program: 'BS CS', year: '2nd', status: 'Active', gpa: 1.75 },
+    { id: '2024-002', name: 'Maria Santos', program: 'BS Acct', year: '3rd', status: 'Active', gpa: 1.5 },
+    { id: '2024-003', name: 'Pedro Garcia', program: 'BS BA', year: '1st', status: 'Active', gpa: 2.0 },
+    { id: '2024-004', name: 'Ana Reyes', program: 'BS Psych', year: '4th', status: 'Active', gpa: 1.25 },
+    { id: '2024-005', name: 'Carlos Lopez', program: 'BS CS', year: '2nd', status: 'LOA', gpa: 2.25 },
   ];
 
-  const pendingRequests = [
-    { id: "REQ-2026-0145", student: "Juan Dela Cruz", type: "Enrollment", program: "Computer Science", date: "2026-05-07", status: "Pending Review" },
-    { id: "REQ-2026-0146", student: "Maria Santos", type: "Transfer of Records", program: "Business Admin", date: "2026-05-07", status: "Pending Review" },
-    { id: "REQ-2026-0147", student: "Pedro Reyes", type: "Change of Program", program: "Engineering", date: "2026-05-06", status: "For Approval" },
-    { id: "REQ-2026-0148", student: "Ana Garcia", type: "Leave of Absence", program: "Education", date: "2026-05-06", status: "Pending Review" },
-    { id: "REQ-2026-0149", student: "Jose Ramos", type: "Cross Enrollment", program: "Computer Science", date: "2026-05-05", status: "For Approval" },
+  const enrollmentStats = [
+    { program: 'BS CS', enrolled: 120 },
+    { program: 'BS Acct', enrolled: 95 },
+    { program: 'BS BA', enrolled: 110 },
+    { program: 'BS Psych', enrolled: 85 },
+    { program: 'Others', enrolled: 70 },
   ];
 
-  const recentGraduates = [
-    { studentId: "2020-001234", name: "Carlos Martinez", program: "Computer Science", gwa: "1.45", honors: "Magna Cum Laude" },
-    { studentId: "2020-001235", name: "Sofia Lopez", program: "Business Admin", gwa: "1.85", honors: "Cum Laude" },
-    { studentId: "2020-001236", name: "Miguel Torres", program: "Engineering", gwa: "1.35", honors: "Summa Cum Laude" },
-    { studentId: "2020-001237", name: "Elena Rivera", program: "Education", gwa: "2.10", honors: "None" },
-  ];
+  const pendingCount = enrollmentRequests.filter((r) => r.status === 'Pending').length;
+  const approvedCount = enrollmentRequests.filter((r) => r.status === 'Approved').length;
 
-  const documentRequests = [
-    { id: "DOC-2026-0234", student: "Luis Fernandez", document: "Transcript of Records", purpose: "Job Application", status: "Ready for Release" },
-    { id: "DOC-2026-0235", student: "Carmen Diaz", document: "Certificate of Enrollment", purpose: "Scholarship", status: "Processing" },
-    { id: "DOC-2026-0236", student: "Roberto Silva", document: "Certificate of Grades", purpose: "Transfer", status: "Ready for Release" },
-    { id: "DOC-2026-0237", student: "Isabella Cruz", document: "Diploma Copy", purpose: "Employment", status: "Processing" },
-  ];
+  const handleApprove = (id: string) => {
+    console.log('Approved enrollment:', id);
+  };
+
+  const handleReject = (id: string) => {
+    console.log('Rejected enrollment:', id);
+  };
 
   return (
-    <DashboardLayout userRole="registrar" userName={registrarName}>
-      <div className="space-y-6">
-        {/* Welcome Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Registrar Dashboard</h1>
-          <p className="text-muted-foreground">Student records and enrollment management</p>
-        </div>
-
-        {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Total Enrolled</CardTitle>
-              <Users className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-primary">1,400</div>
-              <div className="flex items-center gap-1 text-xs text-green-600 mt-1">
-                <TrendingUp className="w-3 h-3" />
-                <span>+3.7% from last semester</span>
+    <DashboardLayout
+      user={user}
+      onLogout={onLogout}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      menuItems={menuItems}
+    >
+      {activeTab === 'dashboard' && (
+        <div className="space-y-6">
+          {/* Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Students</p>
+                  <p className="text-3xl mt-2">{students.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">New Enrollees</CardTitle>
-              <UserPlus className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600">450</div>
-              <p className="text-xs text-muted-foreground mt-1">This semester</p>
-            </CardContent>
-          </Card>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Pending Enrollments</p>
+                  <p className="text-3xl mt-2">{pendingCount}</p>
+                </div>
+                <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-orange-600" />
+                </div>
+              </div>
+            </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Graduating Students</CardTitle>
-              <GraduationCap className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-accent">320</div>
-              <p className="text-xs text-muted-foreground mt-1">Expected this year</p>
-            </CardContent>
-          </Card>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Approved Today</p>
+                  <p className="text-3xl mt-2">{approvedCount}</p>
+                </div>
+                <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Pending Requests</CardTitle>
-              <ClipboardCheck className="w-4 h-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-orange-600">23</div>
-              <p className="text-xs text-muted-foreground mt-1">Requires action</p>
-            </CardContent>
-          </Card>
-        </div>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Subjects</p>
+                  <p className="text-3xl mt-2">{subjects.length}</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* Charts Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Enrollment Trends */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Enrollment & Graduation Trends</CardTitle>
-              <CardDescription>Student enrollment and graduation over time</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={enrollmentTrendsData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="semester" angle={-45} textAnchor="end" height={80} />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="enrolled" stroke="#3b82f6" strokeWidth={2} name="Enrolled" />
-                  <Line type="monotone" dataKey="graduated" stroke="#10b981" strokeWidth={2} name="Graduated" />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Student Status Distribution */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Student Status Distribution</CardTitle>
-              <CardDescription>Current status of all students</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={studentStatusData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {studentStatusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+          {/* Pending Enrollments */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg">Pending Enrollment Requests</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Student ID</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Name</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Program</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Year Level</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Units</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Date</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {enrollmentRequests
+                    .filter((req) => req.status === 'Pending')
+                    .map((req, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm">{req.id}</td>
+                        <td className="px-6 py-4 text-sm">{req.name}</td>
+                        <td className="px-6 py-4 text-sm">{req.program}</td>
+                        <td className="px-6 py-4 text-sm">{req.year}</td>
+                        <td className="px-6 py-4 text-sm">{req.units}</td>
+                        <td className="px-6 py-4 text-sm">{req.date}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleApprove(req.id)}
+                              className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleReject(req.id)}
+                              className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
                     ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Charts Row 2 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Enrollment by Year Level */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Enrollment by Year Level</CardTitle>
-              <CardDescription>Student distribution across year levels</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={enrollmentByYearLevel}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="count" fill="#3b82f6" name="Students" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Program Enrollment vs Capacity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Program Enrollment vs Capacity</CardTitle>
-              <CardDescription>Current enrollment against program capacity</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={programEnrollmentData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="program" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="students" fill="#10b981" name="Enrolled" />
-                  <Bar dataKey="capacity" fill="#e5e7eb" name="Capacity" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Pending Enrollment Requests */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Pending Enrollment Requests</CardTitle>
-              <CardDescription>Student requests requiring registrar action</CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              <FileText className="w-4 h-4 mr-2" />
-              View All
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Request ID</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student Name</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Request Type</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Program</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Date</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pendingRequests.map((request) => (
-                    <tr key={request.id} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-4 text-sm font-mono">{request.id}</td>
-                      <td className="py-3 px-4 text-sm">{request.student}</td>
-                      <td className="py-3 px-4 text-sm">{request.type}</td>
-                      <td className="py-3 px-4 text-sm">{request.program}</td>
-                      <td className="py-3 px-4 text-sm">{request.date}</td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          request.status === "For Approval" ? "bg-orange-100 text-orange-800" : "bg-blue-100 text-blue-800"
-                        }`}>
-                          {request.status}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        <Button variant="outline" size="sm">
-                          Review
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
                 </tbody>
               </table>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Document Requests */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Document Requests</CardTitle>
-            <CardDescription>Student requests for official documents</CardDescription>
-          </CardHeader>
-          <CardContent>
+          {/* Enrollment Statistics */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 className="text-lg mb-4">Enrollment by Program</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={enrollmentStats}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="program" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="enrolled" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'enrollment' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg">All Enrollment Requests</h3>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Request ID</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student Name</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Document Type</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Purpose</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Action</th>
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Student ID</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Name</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Program</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Semester</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Status</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {documentRequests.map((doc) => (
-                    <tr key={doc.id} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-4 text-sm font-mono">{doc.id}</td>
-                      <td className="py-3 px-4 text-sm">{doc.student}</td>
-                      <td className="py-3 px-4 text-sm">{doc.document}</td>
-                      <td className="py-3 px-4 text-sm">{doc.purpose}</td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          doc.status === "Ready for Release" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                        }`}>
-                          {doc.status}
+                <tbody className="divide-y divide-gray-200">
+                  {enrollmentRequests.map((req, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm">{req.id}</td>
+                      <td className="px-6 py-4 text-sm">{req.name}</td>
+                      <td className="px-6 py-4 text-sm">{req.program}</td>
+                      <td className="px-6 py-4 text-sm">{req.semester}</td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full ${
+                            req.status === 'Approved'
+                              ? 'bg-green-100 text-green-700'
+                              : req.status === 'Pending'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {req.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4">
-                        <Button variant="outline" size="sm">
-                          {doc.status === "Ready for Release" ? "Release" : "Process"}
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Graduates with Honors */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Graduates with Honors</CardTitle>
-            <CardDescription>Latest batch of graduating students with academic distinctions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Student ID</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Name</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Program</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">GWA</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Honors</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentGraduates.map((graduate) => (
-                    <tr key={graduate.studentId} className="border-b hover:bg-muted/50">
-                      <td className="py-3 px-4 text-sm font-mono">{graduate.studentId}</td>
-                      <td className="py-3 px-4 text-sm font-semibold">{graduate.name}</td>
-                      <td className="py-3 px-4 text-sm">{graduate.program}</td>
-                      <td className="py-3 px-4 text-sm font-semibold text-primary">{graduate.gwa}</td>
-                      <td className="py-3 px-4">
-                        {graduate.honors !== "None" ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                            {graduate.honors}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
+                      <td className="px-6 py-4">
+                        {req.status === 'Pending' && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleApprove(req.id)}
+                              className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleReject(req.id)}
+                              className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                            >
+                              Reject
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -355,9 +300,189 @@ export default function RegistrarDashboard() {
                 </tbody>
               </table>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'subjects' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg">Subject Management</h3>
+                <button
+                  onClick={() => setShowAddSubject(!showAddSubject)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Subject
+                </button>
+              </div>
+            </div>
+
+            {showAddSubject && (
+              <div className="p-6 border-b border-gray-200 bg-gray-50">
+                <h4 className="text-sm mb-4">Add New Subject</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Subject Code"
+                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Subject Name"
+                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Units"
+                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Instructor"
+                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Available Slots"
+                    className="px-4 py-2 border border-gray-300 rounded-lg"
+                  />
+                  <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Save Subject
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Code</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Subject Name</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Units</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Instructor</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Slots</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {subjects.map((subject, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm">{subject.code}</td>
+                      <td className="px-6 py-4 text-sm">{subject.name}</td>
+                      <td className="px-6 py-4 text-sm">{subject.units}</td>
+                      <td className="px-6 py-4 text-sm">{subject.instructor}</td>
+                      <td className="px-6 py-4 text-sm">{subject.slots}</td>
+                      <td className="px-6 py-4">
+                        <button className="text-blue-600 hover:text-blue-700 text-sm">Edit</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'students' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-lg">Student Records</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Student ID</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Name</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Program</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Year</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">GPA</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Status</th>
+                    <th className="px-6 py-3 text-left text-xs text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {students.map((student, idx) => (
+                    <tr key={idx} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm">{student.id}</td>
+                      <td className="px-6 py-4 text-sm">{student.name}</td>
+                      <td className="px-6 py-4 text-sm">{student.program}</td>
+                      <td className="px-6 py-4 text-sm">{student.year}</td>
+                      <td className="px-6 py-4 text-sm">{student.gpa.toFixed(2)}</td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-2 py-1 text-xs rounded-full ${
+                            student.status === 'Active'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-gray-100 text-gray-700'
+                          }`}
+                        >
+                          {student.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <button className="text-blue-600 hover:text-blue-700 text-sm">View</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'reports' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 className="text-lg mb-4">Generate Reports</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                <FileText className="w-8 h-8 text-blue-600 mb-2" />
+                <p className="text-sm">Enrollment Report</p>
+              </button>
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
+                <FileText className="w-8 h-8 text-green-600 mb-2" />
+                <p className="text-sm">Student List</p>
+              </button>
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
+                <FileText className="w-8 h-8 text-purple-600 mb-2" />
+                <p className="text-sm">Subject Offerings</p>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'settings' && (
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <h3 className="text-lg mb-6">Registrar Settings</h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">Enrollment Period</label>
+              <input
+                type="text"
+                defaultValue="May 1 - June 15, 2026"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">Maximum Units per Semester</label>
+              <input
+                type="number"
+                defaultValue="24"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

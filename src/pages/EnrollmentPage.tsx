@@ -9,6 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Search, Filter } from "lucide-react";
 import { toast } from "sonner";
+import { apiRequest, getStoredUser } from "../lib/api";
+
 
 export default function EnrollmentPage() {
   const location = useLocation();
@@ -21,17 +23,11 @@ export default function EnrollmentPage() {
   const [filterProgram, setFilterProgram] = useState("all");
 
   const courses = [
-    { id: 1, code: "CS101", title: "Introduction to Programming", units: 3, schedule: "MWF 9:00-10:00 AM", instructor: "Prof. Maria Santos", slots: 5, program: "CS" },
-    { id: 2, code: "CS201", title: "Data Structures and Algorithms", units: 3, schedule: "TTh 10:00-11:30 AM", instructor: "Prof. Jose Garcia", slots: 8, program: "CS" },
-    { id: 3, code: "CS301", title: "Software Engineering", units: 3, schedule: "MWF 2:00-3:00 PM", instructor: "Prof. Ana Reyes", slots: 2, program: "CS" },
-    { id: 4, code: "MATH201", title: "Calculus I", units: 3, schedule: "TTh 1:00-2:30 PM", instructor: "Prof. Roberto Cruz", slots: 10, program: "MATH" },
-    { id: 5, code: "MATH202", title: "Calculus II", units: 3, schedule: "MWF 10:00-11:00 AM", instructor: "Prof. Linda Torres", slots: 12, program: "MATH" },
-    { id: 6, code: "ENG102", title: "English Composition", units: 3, schedule: "MWF 1:00-2:00 PM", instructor: "Prof. Carmen Silva", slots: 0, program: "ENG" },
-    { id: 7, code: "ENG201", title: "Literature and Society", units: 3, schedule: "TTh 3:00-4:30 PM", instructor: "Prof. Pedro Ramos", slots: 6, program: "ENG" },
-    { id: 8, code: "BUS101", title: "Principles of Management", units: 3, schedule: "MWF 11:00-12:00 PM", instructor: "Prof. Miguel Santos", slots: 15, program: "BUS" },
-    { id: 9, code: "BUS201", title: "Marketing Management", units: 3, schedule: "TTh 8:00-9:30 AM", instructor: "Prof. Sofia Cruz", slots: 7, program: "BUS" },
-    { id: 10, code: "PE101", title: "Physical Education", units: 2, schedule: "TTh 3:00-4:30 PM", instructor: "Coach Roberto Cruz", slots: 20, program: "PE" },
-  ];
+  { id: 1, code: "CS101", title: "Introduction to Programming", units: 3, schedule: "MWF 9:00-10:00 AM", instructor: "Prof. Maria Santos", slots: 5, program: "CS" },
+  { id: 2, code: "CS201", title: "Data Structures and Algorithms", units: 3, schedule: "TTh 10:00-11:30 AM", instructor: "Prof. Jose Garcia", slots: 8, program: "CS" },
+  { id: 3, code: "CS301", title: "Software Engineering", units: 3, schedule: "MWF 2:00-3:00 PM", instructor: "Prof. Ana Reyes", slots: 2, program: "CS" },
+  { id: 4, code: "MATH201", title: "Calculus I", units: 3, schedule: "TTh 1:00-2:30 PM", instructor: "Prof. Roberto Cruz", slots: 10, program: "MATH" },
+];
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch =
@@ -46,46 +42,28 @@ export default function EnrollmentPage() {
   });
 
   // ✅ FIXED ENROLL FUNCTION (FULL WORKING)
-  const handleEnroll = async (courseCode: string, courseTitle: string) => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+const handleEnroll = async (courseId: number, courseTitle: string) => {
+  try {
+    const user = getStoredUser();
 
-      if (!user?.user_id) {
-        toast.error("You are not logged in");
-        return;
-      }
-
-      const course = courses.find(c => c.code === courseCode);
-
-      if (!course) {
-        toast.error("Course not found");
-        return;
-      }
-
-      const res = await fetch("http://localhost:3001/api/enroll", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentId: user.user_id,
-          courseId: course.id,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Enrollment failed");
-        return;
-      }
-
-      toast.success(`Successfully enrolled in ${courseCode} - ${courseTitle}`);
-    } catch (err) {
-      console.error(err);
-      toast.error("Server error during enrollment");
+    if (!user?.user_id) {
+      toast.error("User not found. Please login again.");
+      return;
     }
-  };
+
+    await apiRequest("/api/enroll", {
+      method: "POST",
+      body: JSON.stringify({
+        studentId: user.user_id,
+        courseId,
+      }),
+    });
+
+    toast.success(`Enrollment submitted for ${courseTitle}`);
+  } catch (err: any) {
+    toast.error(err.message);
+  }
+};
 
   return (
     <DashboardLayout userRole={userRole} userName={userName}>
@@ -189,7 +167,7 @@ export default function EnrollmentPage() {
                           <Button
                             size="sm"
                             disabled={course.slots === 0}
-                            onClick={() => handleEnroll(course.code, course.title)}
+                            onClick={() => handleEnroll(course.id, course.title)}
                           >
                             {course.slots === 0 ? "Full" : "Enroll"}
                           </Button>

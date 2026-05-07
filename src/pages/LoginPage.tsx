@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
+import { apiRequest } from "../lib/api";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,24 +13,14 @@ export default function LoginPage() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:3001/api/login", {
+      const data = await apiRequest("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           // backend expects userId, so we send email/ID here
           userId: email,
           password,
         }),
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.error || "Login failed");
-        return;
-      }
 
       // store session
       localStorage.setItem("token", data.token);
@@ -43,6 +34,7 @@ export default function LoginPage() {
       else if (role === "admin") navigate("/admin");
       else if (role === "finance") navigate("/finance");
       else if (role === "registrar") navigate("/registrar");
+      else navigate("/"); // fallback
     } catch (err) {
       console.error(err);
       alert("Login failed. Server not reachable.");
@@ -128,8 +120,8 @@ export default function LoginPage() {
         {/* Demo Notice */}
         <div className="mt-6 p-3 bg-blue-50 rounded-lg">
           <p className="text-xs text-gray-600 text-center">
-            <strong>Demo Accounts:</strong> Use STU-001, TCH-001, ADM-001,
-            REG-001, FIN-001 with password "demo123"
+            <strong>Demo Accounts:</strong> Use juan@cmdi.edu, maria@cmdi.edu, admin@cmdi.edu,
+            registrar@cmdi.edu, finance@cmdi.edu with password "demo123"
           </p>
         </div>
 
