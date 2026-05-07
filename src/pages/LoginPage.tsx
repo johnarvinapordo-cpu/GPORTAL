@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Lock, Mail } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
@@ -13,115 +13,150 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("student");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Simple demo login - redirect based on user type
-    if (userType === "student") {
-      navigate("/student");
-    } else if (userType === "teacher") {
-      navigate("/teacher");
-    } else if (userType === "admin") {
-      navigate("/admin");
-    } else if (userType === "finance") {
-      navigate("/finance");
-    } else if (userType === "registrar") {
-      navigate("/registrar");
+    try {
+      const res = await fetch("http://localhost:3001/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Login failed");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      const role = data.user.role;
+
+      if (role === "student") navigate("/student");
+      else if (role === "teacher") navigate("/teacher");
+      else if (role === "admin") navigate("/admin");
+      else if (role === "finance") navigate("/finance");
+      else if (role === "registrar") navigate("/registrar");
+      else navigate("/");
+
+    } catch (err) {
+      console.error(err);
+      alert("Login failed");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1e3a8a] via-[#3b82f6] to-[#60a5fa] flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
       <div className="w-full max-w-md">
-        {/* Logo and Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-lg mb-4">
-            <GraduationCap className="w-12 h-12 text-[#1e3a8a]" />
+
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+              <GraduationCap className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-2xl mb-1 font-semibold">CMDI Grade Portal</h1>
+            <p className="text-sm text-gray-600">
+              Student Academic, Enrollment & Financial Services
+            </p>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">CMDI Grade Portal</h1>
-          <p className="text-blue-100">CARD-MRI Development Institute Inc.</p>
-          <p className="text-blue-200 text-sm mt-1">Student Academic, Enrollment & Financial Services</p>
-        </div>
 
-        {/* Login Card */}
-        <Card className="shadow-2xl">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
-            <CardDescription className="text-center">
-              Sign in to access your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="userType">Account Type</Label>
-                <Select value={userType} onValueChange={setUserType}>
-                  <SelectTrigger id="userType">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="student">Student</SelectItem>
-                    <SelectItem value="teacher">Teacher / Employee</SelectItem>
-                    <SelectItem value="admin">Administrator</SelectItem>
-                    <SelectItem value="finance">Finance Office</SelectItem>
-                    <SelectItem value="registrar">Registrar Office</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-5">
 
-              <div className="space-y-2">
-                <Label htmlFor="userId">
-                  {userType === "student" ? "Student ID" : "Employee ID"}
-                </Label>
+            {/* Account Type (kept your logic) */}
+            <div>
+              <Label className="block text-sm mb-2 text-gray-700">
+                Account Type
+              </Label>
+              <Select value={userType} onValueChange={setUserType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="teacher">Teacher / Employee</SelectItem>
+                  <SelectItem value="admin">Administrator</SelectItem>
+                  <SelectItem value="finance">Finance Office</SelectItem>
+                  <SelectItem value="registrar">Registrar Office</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* ID */}
+            <div>
+              <Label className="block text-sm mb-2 text-gray-700">
+                ID / Email Address
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                 <Input
-                  id="userId"
+                  className="pl-10"
                   type="text"
-                  placeholder={userType === "student" ? "Enter your Student ID" : "Enter your Employee ID"}
+                  placeholder="Enter your ID or Email"
                   value={userId}
                   onChange={(e) => setUserId(e.target.value)}
-                  className="bg-input-background"
                   required
                 />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+            {/* Password */}
+            <div>
+              <Label className="block text-sm mb-2 text-gray-700">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
                 <Input
-                  id="password"
+                  className="pl-10"
                   type="password"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-input-background"
                   required
                 />
               </div>
-
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded border-input" />
-                  <span className="text-muted-foreground">Remember me</span>
-                </label>
-                <a href="#" className="text-primary hover:underline">
-                  Forgot password?
-                </a>
-              </div>
-
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-                Sign In
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center text-sm text-muted-foreground">
-              <p>Need help? Contact IT Support</p>
-              <p className="mt-1">support@cmdi.edu.ph</p>
             </div>
-          </CardContent>
-        </Card>
 
-        <p className="text-center text-sm text-blue-100 mt-6">
-          © 2026 CARD-MRI Development Institute Inc. All rights reserved.
+            {/* Remember + Forgot */}
+            <div className="flex justify-between text-sm">
+              <label className="flex items-center gap-2">
+                <input type="checkbox" />
+                <span className="text-gray-600">Remember me</span>
+              </label>
+              <a href="#" className="text-blue-600 hover:underline">
+                Forgot password?
+              </a>
+            </div>
+
+            {/* Button */}
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+              Sign In
+            </Button>
+          </form>
+
+          {/* Footer */}
+          <div className="text-center mt-6 text-sm text-gray-500">
+            Need help? Contact IT Support <br />
+            support@cmdi.edu.ph
+          </div>
+
+        </div>
+
+        <p className="text-center text-xs text-gray-500 mt-4">
+          © 2026 CARD-MRI Development Institute Inc.
         </p>
+
       </div>
     </div>
   );
