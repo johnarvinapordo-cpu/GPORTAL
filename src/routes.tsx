@@ -1,10 +1,12 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter } from "react-router-dom";
+
 import LoginPage from "./pages/LoginPage";
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import FinanceDashboard from "./pages/FinanceDashboard";
 import RegistrarDashboard from "./pages/RegistrarDashboard";
+
 import EnrollmentPage from "./pages/EnrollmentPage";
 import GradesPage from "./pages/GradesPage";
 import TuitionPage from "./pages/TuitionPage";
@@ -12,10 +14,13 @@ import EvaluationPage from "./pages/EvaluationPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import StudentListPage from "./pages/StudentListPage";
 import CourseManagementPage from "./pages/CourseManagementPage";
+
 import FinanceStudentAccountsPage from "./pages/FinanceStudentAccountsPage";
 import FinancePaymentsBillingPage from "./pages/FinancePaymentsBillingPage";
 import FinanceReportsPage from "./pages/FinanceReportsPage";
+
 import RegistrarStudentRecordsPage from "./pages/RegistrarStudentRecordsPage";
+
 import NotificationsPage from "./pages/NotificationsPage";
 import ProfilePage from "./pages/ProfilePage";
 
@@ -24,6 +29,8 @@ export const router = createBrowserRouter([
     path: "/",
     Component: LoginPage,
   },
+
+  // STUDENT
   {
     path: "/student",
     Component: StudentDashboard,
@@ -44,6 +51,8 @@ export const router = createBrowserRouter([
     path: "/student/evaluation",
     Component: EvaluationPage,
   },
+
+  // TEACHER
   {
     path: "/teacher",
     Component: TeacherDashboard,
@@ -64,6 +73,8 @@ export const router = createBrowserRouter([
     path: "/teacher/evaluation",
     Component: EvaluationPage,
   },
+
+  // ADMIN
   {
     path: "/admin",
     Component: AdminDashboard,
@@ -92,6 +103,8 @@ export const router = createBrowserRouter([
     path: "/admin/financial",
     Component: TuitionPage,
   },
+
+  // FINANCE
   {
     path: "/finance",
     Component: FinanceDashboard,
@@ -110,12 +123,18 @@ export const router = createBrowserRouter([
   },
   {
     path: "/finance/notifications",
-    Component: () => <NotificationsPage userRole="finance" userName="Finance Officer" />,
+    Component: () => (
+      <NotificationsPage userRole="finance" userName="Finance Officer" />
+    ),
   },
   {
     path: "/finance/profile",
-    Component: () => <ProfilePage userRole="finance" userName="Finance Officer" />,
+    Component: () => (
+      <ProfilePage userRole="finance" userName="Finance Officer" />
+    ),
   },
+
+  // REGISTRAR
   {
     path: "/registrar",
     Component: RegistrarDashboard,
@@ -138,10 +157,14 @@ export const router = createBrowserRouter([
   },
   {
     path: "/registrar/notifications",
-    Component: () => <NotificationsPage userRole="registrar" userName="Registrar Officer" />,
+    Component: () => (
+      <NotificationsPage userRole="registrar" userName="Registrar Officer" />
+    ),
   },
   {
     path: "/registrar/profile",
-    Component: () => <ProfilePage userRole="registrar" userName="Registrar Officer" />,
+    Component: () => (
+      <ProfilePage userRole="registrar" userName="Registrar Officer" />
+    ),
   },
 ]);

@@ -1,17 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
-import { GraduationCap, Lock, Mail } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { useNavigate } from "react-router-dom";
+import { Mail, Lock } from "lucide-react";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
+
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("student");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +18,8 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId,
+          // backend expects userId, so we send email/ID here
+          userId: email,
           password,
         }),
       });
@@ -35,9 +31,11 @@ export default function LoginPage() {
         return;
       }
 
+      // store session
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
+      // role-based redirect
       const role = data.user.role;
 
       if (role === "student") navigate("/student");
@@ -45,118 +43,100 @@ export default function LoginPage() {
       else if (role === "admin") navigate("/admin");
       else if (role === "finance") navigate("/finance");
       else if (role === "registrar") navigate("/registrar");
-      else navigate("/");
-
     } catch (err) {
       console.error(err);
-      alert("Login failed");
+      alert("Login failed. Server not reachable.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
-              <GraduationCap className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-2xl mb-1 font-semibold">CMDI Grade Portal</h1>
-            <p className="text-sm text-gray-600">
-              Student Academic, Enrollment & Financial Services
-            </p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-5">
-
-            {/* Account Type (kept your logic) */}
-            <div>
-              <Label className="block text-sm mb-2 text-gray-700">
-                Account Type
-              </Label>
-              <Select value={userType} onValueChange={setUserType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="teacher">Teacher / Employee</SelectItem>
-                  <SelectItem value="admin">Administrator</SelectItem>
-                  <SelectItem value="finance">Finance Office</SelectItem>
-                  <SelectItem value="registrar">Registrar Office</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* ID */}
-            <div>
-              <Label className="block text-sm mb-2 text-gray-700">
-                ID / Email Address
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
-                <Input
-                  className="pl-10"
-                  type="text"
-                  placeholder="Enter your ID or Email"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <Label className="block text-sm mb-2 text-gray-700">
-                Password
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
-                <Input
-                  className="pl-10"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Remember + Forgot */}
-            <div className="flex justify-between text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" />
-                <span className="text-gray-600">Remember me</span>
-              </label>
-              <a href="#" className="text-blue-600 hover:underline">
-                Forgot password?
-              </a>
-            </div>
-
-            {/* Button */}
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-              Sign In
-            </Button>
-          </form>
-
-          {/* Footer */}
-          <div className="text-center mt-6 text-sm text-gray-500">
-            Need help? Contact IT Support <br />
-            support@cmdi.edu.ph
-          </div>
-
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
+            CMDI Grade Portal
+          </h1>
+          <p className="text-sm text-gray-500">
+            CARD-MRI Development Institute Inc.
+          </p>
         </div>
 
-        <p className="text-center text-xs text-gray-500 mt-4">
+        {/* Form */}
+        <form onSubmit={handleLogin} className="space-y-5">
+
+          {/* Email / ID */}
+          <div>
+            <label className="block text-sm mb-2 text-gray-700">
+              ID or Email
+            </label>
+
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your ID or email"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-sm mb-2 text-gray-700">
+              Password
+            </label>
+
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Options */}
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="rounded border-gray-300" />
+              <span className="text-gray-600">Remember me</span>
+            </label>
+
+            <a href="#" className="text-blue-600 hover:text-blue-700">
+              Forgot Password?
+            </a>
+          </div>
+
+          {/* Button */}
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Login
+          </button>
+        </form>
+
+        {/* Demo Notice */}
+        <div className="mt-6 p-3 bg-blue-50 rounded-lg">
+          <p className="text-xs text-gray-600 text-center">
+            <strong>Demo Accounts:</strong> Use STU-001, TCH-001, ADM-001,
+            REG-001, FIN-001 with password "demo123"
+          </p>
+        </div>
+
+        {/* Footer */}
+        <p className="text-center text-xs text-gray-500 mt-6">
           © 2026 CARD-MRI Development Institute Inc.
         </p>
-
       </div>
     </div>
   );

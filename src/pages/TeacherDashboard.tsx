@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Badge } from "../components/ui/badge";
 import { BookOpen, ClipboardCheck, Users, Bell, AlertCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 export default function TeacherDashboard() {
   const teacherName = "Prof. Maria Santos";
