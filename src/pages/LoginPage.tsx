@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { storeSession } from "../lib/api";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import { apiRequest } from "../lib/api";
+
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -23,8 +25,9 @@ export default function LoginPage() {
       });
 
       // store session
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // store session correctly
+storeSession(data);
+
 
       // role-based redirect
       const role = data.user.role;

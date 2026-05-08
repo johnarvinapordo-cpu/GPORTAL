@@ -32,7 +32,10 @@ async function query(sql, params) {
 app.post('/api/login', async (req, res) => {
   try {
     const { userId, password } = req.body;
-    const users = await query('SELECT * FROM users WHERE user_id = ?', [userId]);
+    const users = await query(
+  'SELECT * FROM users WHERE user_id = ? OR email = ?',
+  [userId, userId]
+);
 
     if (users.length === 0) {
       return res.status(401).json({ error: 'User not found' });
@@ -58,6 +61,11 @@ app.post('/api/login', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+
+app.get("/", (req, res) => {
+  res.json({ message: "CMDI API is running 🚀" });
 });
 
 // Get student dashboard data

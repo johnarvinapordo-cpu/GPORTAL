@@ -116,12 +116,12 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 -- Insert demo users (password: demo123)
-INSERT IGNORE INTO users (user_id, name, email, password, role) VALUES
-('STU-001', 'Juan Dela Cruz', 'juan@cmdi.edu', '$2a$10$demo123', 'student'),
-('TCH-001', 'Maria Santos', 'maria@cmdi.edu', '$2a$10$demo123', 'teacher'),
-('ADM-001', 'Admin User', 'admin@cmdi.edu', '$2a$10$demo123', 'admin'),
-('REG-001', 'Registrar User', 'registrar@cmdi.edu', '$2a$10$demo123', 'registrar'),
-('FIN-001', 'Finance User', 'finance@cmdi.edu', '$2a$10$demo123', 'finance');
+INSERT INTO users (user_id, name, email, password, role) VALUES
+('STU-001', 'Juan Dela Cruz', 'juan@cmdi.edu', '$2b$10$8K1p/a0dR8sYw7J0wz7K9e8V2YQ0lD6XzF1qK0V7A2f6FhK9mR7y2', 'student'),
+('TCH-001', 'Maria Santos', 'maria@cmdi.edu', '$2b$10$8K1p/a0dR8sYw7J0wz7K9e8V2YQ0lD6XzF1qK0V7A2f6FhK9mR7y2', 'teacher'),
+('ADM-001', 'Admin User', 'admin@cmdi.edu', '$2b$10$8K1p/a0dR8sYw7J0wz7K9e8V2YQ0lD6XzF1qK0V7A2f6FhK9mR7y2', 'admin'),
+('REG-001', 'Registrar User', 'registrar@cmdi.edu', '$2b$10$8K1p/a0dR8sYw7J0wz7K9e8V2YQ0lD6XzF1qK0V7A2f6FhK9mR7y2', 'registrar'),
+('FIN-001', 'Finance User', 'finance@cmdi.edu', '$2b$10$8K1p/a0dR8sYw7J0wz7K9e8V2YQ0lD6XzF1qK0V7A2f6FhK9mR7y2', 'finance');
 
 -- Insert demo courses
 INSERT IGNORE INTO courses (course_code, title, units, schedule, instructor_id, capacity) VALUES

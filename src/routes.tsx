@@ -27,7 +27,8 @@ import ProfilePage from "./pages/ProfilePage";
 
 
 // 🔐 simple auth guard
-const getUser = () => JSON.parse(localStorage.getItem("user") || "null");
+const getUser = () =>
+  JSON.parse(localStorage.getItem("cmdi_user") || "null");
 
 const ProtectedRoute = ({ children, role }: any) => {
   const user = getUser();

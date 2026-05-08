@@ -1,5 +1,6 @@
 const API_BASE = "http://localhost:3001";
 
+console.log("Calling API:", `${API_BASE}${path}`);
 
 export async function apiRequest(path, options = {}) {
   let response;
