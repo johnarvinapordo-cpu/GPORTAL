@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
-
-import { apiRequest, storeSession } from "../lib/api";
 import { useAuth } from "../context/AuthContext";
+import { apiRequest, storeSession } from "../lib/api";
+
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -35,10 +35,14 @@ export default function LoginPage() {
       };
 
       // save session
-      storeSession({
-        token: data.token,
-        user: normalizedUser,
-      });
+     
+storeSession({
+  token: data.token,
+  user: data.user,
+});
+
+// IMPORTANT: update React context
+setUser(data.user);
 
       // update auth context
       setUser(normalizedUser);
