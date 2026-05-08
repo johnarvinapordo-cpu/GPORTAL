@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import DashboardLayout from "../components/layout/DashboardLayout";
+import { useAuth } from '../context/AuthContext';
+import StatCard from '../components/dashboard/StatCard';
+import DashboardTable from '../components/dashboard/DashboardTable';
+import ChartCard from '../components/dashboard/ChartCard';
+import FormCard from '../components/dashboard/FormCard';
 import {
   LayoutDashboard,
   DollarSign,
@@ -14,14 +18,14 @@ import {
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-interface FinanceDashboardProps {
-  user: { role: string; name: string; id: string };
-  onLogout: () => void;
-}
-
-export default function FinanceDashboard({ user, onLogout }: FinanceDashboardProps) {
+export default function FinanceDashboard() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showRecordPayment, setShowRecordPayment] = useState(false);
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -108,359 +112,276 @@ export default function FinanceDashboard({ user, onLogout }: FinanceDashboardPro
   };
 
   return (
-    <DashboardLayout
-      user={user}
-      onLogout={onLogout}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-      menuItems={menuItems}
-    >
-      {activeTab === 'dashboard' && (
-        <div className="space-y-6">
-          {/* Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Collected</p>
-                  <p className="text-2xl mt-2">₱{totalCollected.toLocaleString()}</p>
-                  <p className="text-xs text-green-600 mt-2 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" />
-                    This Month
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-6 h-6 text-green-600" />
-                </div>
-              </div>
+    <div>
+      {/* Horizontal Tab Navigation */}
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-2 border-b border-gray-200">
+        {menuItems.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => setActiveTab(item.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors whitespace-nowrap text-sm font-medium ${
+              activeTab === item.id
+                ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-600'
+                : 'text-gray-700 hover:bg-gray-50'
+            }`}
+          >
+            {item.icon}
+            {item.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-6">
+        {activeTab === 'dashboard' && (
+          <div className="space-y-6">
+            {/* Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <StatCard
+                title="Total Collected"
+                value={`₱${totalCollected.toLocaleString()}`}
+                subtitle="This Month"
+                icon={<DollarSign className="w-6 h-6" />}
+                iconBgColor="bg-green-50"
+                iconColor="text-green-600"
+              />
+              <StatCard
+                title="Pending Balance"
+                value={`₱${totalPending.toLocaleString()}`}
+                subtitle="Outstanding"
+                icon={<Clock className="w-6 h-6" />}
+                iconBgColor="bg-orange-50"
+                iconColor="text-orange-600"
+              />
+              <StatCard
+                title="Paid Students"
+                value={`${paidStudents}/${totalStudents}`}
+                subtitle={`${((paidStudents / totalStudents) * 100).toFixed(0)}% Complete`}
+                icon={<CheckCircle className="w-6 h-6" />}
+                iconBgColor="bg-blue-50"
+                iconColor="text-blue-600"
+              />
+              <StatCard
+                title="Transactions"
+                value={paymentRecords.length}
+                subtitle="Today"
+                icon={<FileText className="w-6 h-6" />}
+                iconBgColor="bg-purple-50"
+                iconColor="text-purple-600"
+              />
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Pending Balance</p>
-                  <p className="text-2xl mt-2">₱{totalPending.toLocaleString()}</p>
-                  <p className="text-xs text-orange-600 mt-2 flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    Outstanding
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-orange-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Paid Students</p>
-                  <p className="text-2xl mt-2">
-                    {paidStudents}/{totalStudents}
-                  </p>
-                  <p className="text-xs text-blue-600 mt-2">
-                    {((paidStudents / totalStudents) * 100).toFixed(0)}% Complete
-                  </p>
-                </div>
-                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-6 h-6 text-blue-600" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Transactions</p>
-                  <p className="text-2xl mt-2">{paymentRecords.length}</p>
-                  <p className="text-xs text-purple-600 mt-2">Today</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Revenue Chart */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg mb-4">Revenue Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value) => `₱${Number(value).toLocaleString()}`} />
-                <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Payment Methods & Recent Payments */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg mb-4">Payment Methods</h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={paymentMethodData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {paymentMethodData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
+            {/* Revenue Chart */}
+            <ChartCard title="Revenue Trend">
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => `₱${Number(value).toLocaleString()}`} />
+                  <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={2} />
+                </LineChart>
               </ResponsiveContainer>
-            </div>
+            </ChartCard>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg">Recent Payments</h3>
-              </div>
-              <div className="p-6 space-y-4">
-                {paymentRecords.slice(0, 4).map((payment, idx) => (
-                  <div key={idx} className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <DollarSign className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm">{payment.studentName}</p>
-                      <p className="text-xs text-gray-500 mt-1">{payment.description}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm">₱{payment.amount.toLocaleString()}</p>
-                      <p className="text-xs text-gray-500">{payment.date}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+            {/* Payment Methods & Recent Payments */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <ChartCard title="Payment Methods">
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={paymentMethodData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}%`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {paymentMethodData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartCard>
 
-      {activeTab === 'payments' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg">Payment Records</h3>
-                <button
-                  onClick={() => setShowRecordPayment(!showRecordPayment)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Record Payment
-                </button>
-              </div>
-            </div>
-
-            {showRecordPayment && (
-              <div className="p-6 border-b border-gray-200 bg-gray-50">
-                <h4 className="text-sm mb-4">New Payment Record</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="Student ID"
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Amount"
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Description"
-                    className="px-4 py-2 border border-gray-300 rounded-lg"
-                  />
-                  <select className="px-4 py-2 border border-gray-300 rounded-lg">
-                    <option>Cash</option>
-                    <option>Bank Transfer</option>
-                    <option>Online Payment</option>
-                  </select>
-                  <button className="md:col-span-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-                    Save Payment
-                  </button>
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+                <div className="p-6 border-b border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900">Recent Payments</h3>
+                </div>
+                <div className="p-6 space-y-4">
+                  {paymentRecords.slice(0, 4).map((payment, idx) => (
+                    <div key={idx} className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <DollarSign className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{payment.studentName}</p>
+                        <p className="text-sm text-gray-600 mt-1">{payment.description}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-sm font-medium text-gray-900">₱{payment.amount.toLocaleString()}</p>
+                        <p className="text-xs text-gray-500 mt-1">{payment.date}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Payment ID</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Student</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Description</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Method</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Date</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {paymentRecords.map((payment, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm">{payment.id}</td>
-                      <td className="px-6 py-4 text-sm">
-                        <div>
-                          <p>{payment.studentName}</p>
-                          <p className="text-xs text-gray-500">{payment.studentId}</p>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm">{payment.description}</td>
-                      <td className="px-6 py-4 text-sm">₱{payment.amount.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-sm">{payment.method}</td>
-                      <td className="px-6 py-4 text-sm">{payment.date}</td>
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => handleGenerateReceipt(payment.id)}
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm"
-                        >
-                          <Download className="w-4 h-4" />
-                          Receipt
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {activeTab === 'students' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg">Student Account Summary</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Student ID</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Name</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Total Fee</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Paid</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Balance</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Status</th>
-                    <th className="px-6 py-3 text-left text-xs text-gray-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {studentAccounts.map((student, idx) => (
-                    <tr key={idx} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm">{student.id}</td>
-                      <td className="px-6 py-4 text-sm">{student.name}</td>
-                      <td className="px-6 py-4 text-sm">₱{student.totalFee.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-sm text-green-600">₱{student.paid.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-sm text-red-600">₱{student.balance.toLocaleString()}</td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            student.status === 'Paid'
-                              ? 'bg-green-100 text-green-700'
-                              : student.status === 'Partial'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-red-100 text-red-700'
-                          }`}
-                        >
-                          {student.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button className="text-blue-600 hover:text-blue-700 text-sm">View Details</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        {activeTab === 'payments' && (
+          <div className="space-y-6">
+            <FormCard title="Payment Records" subtitle="Track all student payments and transactions">
+              <button
+                onClick={() => setShowRecordPayment(!showRecordPayment)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                Record Payment
+              </button>
+
+              {showRecordPayment && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-4">New Payment Record</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Student ID" className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    <input type="number" placeholder="Amount" className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    <input type="text" placeholder="Description" className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                    <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <option>Cash</option>
+                      <option>Bank Transfer</option>
+                      <option>Online Payment</option>
+                    </select>
+                    <button className="md:col-span-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                      Save Payment
+                    </button>
+                  </div>
+                </div>
+              )}
+            </FormCard>
+
+            <DashboardTable
+              title="Payment Records"
+              columns={[
+                { key: 'id', label: 'Payment ID' },
+                {
+                  key: 'studentName',
+                  label: 'Student',
+                  render: (value, row) => (
+                    <div>
+                      <p className="font-medium text-gray-900">{value}</p>
+                      <p className="text-xs text-gray-500">{row.studentId}</p>
+                    </div>
+                  ),
+                },
+                { key: 'description', label: 'Description' },
+                { key: 'amount', label: 'Amount', render: (value) => `₱${value.toLocaleString()}` },
+                { key: 'method', label: 'Method' },
+                { key: 'date', label: 'Date' },
+              ]}
+              data={paymentRecords}
+              actions={(row) => (
+                <button onClick={() => handleGenerateReceipt(row.id)} className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm">
+                  <Download className="w-4 h-4" />
+                  Receipt
+                </button>
+              )}
+            />
           </div>
-        </div>
-      )}
+        )}
 
-      {activeTab === 'receipts' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-              <h3 className="text-lg">Receipt Management</h3>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                  <Download className="w-8 h-8 text-blue-600 mb-2 mx-auto" />
-                  <p className="text-sm">Generate Receipt</p>
-                </button>
-                <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-                  <FileText className="w-8 h-8 text-green-600 mb-2 mx-auto" />
-                  <p className="text-sm">View All Receipts</p>
-                </button>
-                <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
-                  <Download className="w-8 h-8 text-purple-600 mb-2 mx-auto" />
-                  <p className="text-sm">Export to PDF</p>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        {activeTab === 'students' && (
+          <DashboardTable
+            title="Student Account Summary"
+            columns={[
+              { key: 'id', label: 'Student ID' },
+              { key: 'name', label: 'Name' },
+              { key: 'totalFee', label: 'Total Fee', render: (value) => `₱${value.toLocaleString()}` },
+              { key: 'paid', label: 'Paid', render: (value) => <span className="text-green-600 font-medium">₱{value.toLocaleString()}</span> },
+              { key: 'balance', label: 'Balance', render: (value) => <span className="text-red-600 font-medium">₱{value.toLocaleString()}</span> },
+              {
+                key: 'status',
+                label: 'Status',
+                render: (value) => (
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full font-medium ${
+                      value === 'Paid'
+                        ? 'bg-green-100 text-green-700'
+                        : value === 'Partial'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {value}
+                  </span>
+                ),
+              },
+            ]}
+            data={studentAccounts}
+            actions={() => <button className="text-blue-600 hover:text-blue-700 text-sm">View Details</button>}
+          />
+        )}
 
-      {activeTab === 'reports' && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <h3 className="text-lg mb-4">Financial Reports</h3>
+        {activeTab === 'receipts' && (
+          <FormCard title="Receipt Management">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-                <FileText className="w-8 h-8 text-blue-600 mb-2" />
-                <p className="text-sm">Payment Summary</p>
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-center">
+                <Download className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <p className="text-sm font-medium text-gray-900">Generate Receipt</p>
               </button>
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-                <FileText className="w-8 h-8 text-green-600 mb-2" />
-                <p className="text-sm">Outstanding Balances</p>
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
+                <FileText className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <p className="text-sm font-medium text-gray-900">View All Receipts</p>
               </button>
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
-                <FileText className="w-8 h-8 text-purple-600 mb-2" />
-                <p className="text-sm">Revenue Report</p>
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors text-center">
+                <Download className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <p className="text-sm font-medium text-gray-900">Export to PDF</p>
               </button>
             </div>
-          </div>
-        </div>
-      )}
+          </FormCard>
+        )}
 
-      {activeTab === 'settings' && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <h3 className="text-lg mb-6">Finance Settings</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-600 mb-2">Payment Deadline</label>
-              <input
-                type="date"
-                defaultValue="2026-06-30"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              />
+        {activeTab === 'reports' && (
+          <FormCard title="Financial Reports">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-center">
+                <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <p className="text-sm font-medium text-gray-900">Payment Summary</p>
+              </button>
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
+                <FileText className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <p className="text-sm font-medium text-gray-900">Outstanding Balances</p>
+              </button>
+              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors text-center">
+                <FileText className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <p className="text-sm font-medium text-gray-900">Revenue Report</p>
+              </button>
             </div>
-            <div>
-              <label className="block text-sm text-gray-600 mb-2">Late Payment Fee (%)</label>
-              <input
-                type="number"
-                defaultValue="5"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              />
+          </FormCard>
+        )}
+
+        {activeTab === 'settings' && (
+          <FormCard title="Finance Settings" subtitle="Configure payment deadlines and fees">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Deadline</label>
+                <input type="date" defaultValue="2026-06-30" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Late Payment Fee (%)</label>
+                <input type="number" defaultValue="5" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+              </div>
+              <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                Save Settings
+              </button>
             </div>
-          </div>
-        </div>
-      )}
-    </DashboardLayout>
+          </FormCard>
+        )}
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
 import type { AppUser } from "../types";
 
 interface AuthContextType {
@@ -17,23 +23,30 @@ const AuthContext = createContext<AuthContextType>({
   setUser: () => {},
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [user, setUserState] = useState<AppUser | null>(null);
+
   const [profile, setProfile] = useState<AppUser | null>(null);
+
   const [loading, setLoading] = useState(true);
 
-  // Load user on app start
+  // LOAD USER ON APP START
   useEffect(() => {
-    const stored =
+    const storedUser =
       localStorage.getItem("cmdi_user") ||
       localStorage.getItem("user");
 
-    if (stored) {
+    if (storedUser) {
       try {
-        const parsed: AppUser = JSON.parse(stored);
-        setUserState(parsed);
-        setProfile(parsed);
-      } catch {
+        const parsedUser: AppUser = JSON.parse(storedUser);
+
+        setUserState(parsedUser);
+        setProfile(parsedUser);
+      } catch (error) {
+        console.error("Failed to parse user:", error);
+
         setUserState(null);
         setProfile(null);
       }
@@ -45,17 +58,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // LOGIN / SET USER
   const setUser = (newUser: AppUser) => {
     setUserState(newUser);
+
     setProfile(newUser);
-    localStorage.setItem("cmdi_user", JSON.stringify(newUser));
+
+    localStorage.setItem(
+      "cmdi_user",
+      JSON.stringify(newUser)
+    );
   };
 
   // LOGOUT
   const signOut = () => {
     setUserState(null);
+
     setProfile(null);
 
     localStorage.removeItem("cmdi_user");
     localStorage.removeItem("cmdi_token");
+
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   };
@@ -75,5 +95,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Hook
+// HOOK
 export const useAuth = () => useContext(AuthContext);

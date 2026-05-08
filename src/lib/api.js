@@ -1,9 +1,10 @@
 const API_BASE = "http://localhost:3001";
 
-console.log("Calling API:", `${API_BASE}${path}`);
-
 export async function apiRequest(path, options = {}) {
+  console.log("Calling API:", `${API_BASE}${path}`);
+
   let response;
+
   try {
     response = await fetch(`${API_BASE}${path}`, {
       headers: {
@@ -13,13 +14,21 @@ export async function apiRequest(path, options = {}) {
       ...options,
     });
   } catch {
-    throw new Error("Cannot reach the backend API. Start it with npm run server, then try again.");
+    throw new Error(
+      "Cannot reach the backend API. Start it with npm run server, then try again."
+    );
   }
 
   const text = await response.text();
+
   const data = text ? tryParseJson(text) : {};
+
   if (!response.ok) {
-    throw new Error(data.error || data.message || `Backend request failed (${response.status}).`);
+    throw new Error(
+      data.error ||
+        data.message ||
+        `Backend request failed (${response.status}).`
+    );
   }
 
   return data;

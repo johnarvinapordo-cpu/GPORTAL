@@ -27,15 +27,23 @@ import ProfilePage from "./pages/ProfilePage";
 
 
 // 🔐 simple auth guard
-const getUser = () =>
-  JSON.parse(localStorage.getItem("cmdi_user") || "null");
+const getUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem("cmdi_user") || "null");
+  } catch {
+    return null;
+  }
+};
+
+import { useAuth } from "./context/AuthContext";
 
 const ProtectedRoute = ({ children, role }: any) => {
-  const user = getUser();
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
 
   if (!user) return <Navigate to="/" replace />;
 
-  // prevent wrong role access (THIS fixes bouncing issue)
   if (role && user.role !== role) {
     return <Navigate to={`/${user.role}`} replace />;
   }

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -13,7 +13,9 @@ import {
   BarChart3,
   Settings,
   FileText,
-  Calendar
+  Calendar,
+  Menu,
+  X
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { cn } from "../../lib/utils";
@@ -33,6 +35,7 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children, userRole, userName }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const studentNavItems: NavItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/student" },
@@ -99,52 +102,58 @@ export default function DashboardLayout({ children, userRole, userName }: Dashbo
   };
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1e3a8a] text-white flex flex-col">
+      <aside 
+        className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-40 transition-transform duration-300 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 w-64`}
+      >
         {/* Logo */}
-        <div className="p-6 border-b border-[#1e40af]">
+        <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-lg text-white">CMDI</h1>
-              <p className="text-xs text-blue-200">Grade Portal</p>
+              <h1 className="text-lg font-semibold text-gray-900">CMDI Portal</h1>
+              <p className="text-xs text-gray-500 capitalize">{userRole}</p>
             </div>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+        <nav className="p-4 space-y-1">
           {navItems.map((item) => (
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                navigate(item.path);
+                setSidebarOpen(false);
+              }}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
-                location.pathname === item.path
-                  ? "bg-[#3b82f6] text-white"
-                  : "text-blue-100 hover:bg-[#1e40af]"
+                "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm",
+                location.pathname === item.path || location.pathname.startsWith(item.path + '/')
+                  ? "bg-blue-50 text-blue-600 font-medium"
+                  : "text-gray-700 hover:bg-gray-50"
               )}
             >
               {item.icon}
-              <span className="text-sm">{item.label}</span>
+              <span>{item.label}</span>
             </button>
           ))}
         </nav>
 
         {/* User Profile & Logout */}
-        <div className="p-4 border-t border-[#1e40af]">
-          <div className="mb-3 px-4 py-2">
-            <p className="text-xs text-blue-200">Logged in as</p>
-            <p className="text-sm font-medium text-white">{userName}</p>
-            <p className="text-xs text-blue-200 capitalize">{userRole}</p>
+        <div className="p-4 border-t border-gray-200 space-y-3">
+          <div className="px-4 py-2">
+            <p className="text-xs text-gray-500">Logged in as</p>
+            <p className="text-sm font-medium text-gray-900">{userName}</p>
+            <p className="text-xs text-gray-500 capitalize">{userRole}</p>
           </div>
           <Button
             onClick={handleLogout}
-            variant="outline"
-            className="w-full bg-transparent border-blue-400 text-white hover:bg-[#1e40af] hover:text-white"
+            className="w-full bg-gray-100 text-gray-700 hover:bg-gray-200"
           >
             <LogOut className="w-4 h-4 mr-2" />
             Logout
@@ -152,32 +161,51 @@ export default function DashboardLayout({ children, userRole, userName }: Dashbo
         </div>
       </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-card border-b border-border px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold text-foreground">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Main content */}
+      <div className="lg:ml-64">
+        {/* Top header */}
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+              >
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+              <h2 className="text-xl font-semibold text-gray-900">
                 CARD-MRI Development Institute Inc.
               </h2>
-              <p className="text-sm text-muted-foreground">Academic Management System</p>
             </div>
+
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
-                <Bell className="w-5 h-5" />
-              </Button>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary-foreground" />
+              <button className="relative p-2 hover:bg-gray-100 rounded-lg">
+                <Bell className="w-5 h-5 text-gray-600" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              </button>
+              <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-gray-900">{userName}</p>
+                  <p className="text-xs text-gray-500 capitalize">{userRole}</p>
+                </div>
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
                 </div>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Content Area */}
-        <main className="flex-1 overflow-y-auto p-8">
+        {/* Page content */}
+        <main className="p-6">
           {children}
         </main>
       </div>
