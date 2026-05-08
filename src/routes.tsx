@@ -25,18 +25,9 @@ import RegistrarStudentRecordsPage from "./pages/RegistrarStudentRecordsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ProfilePage from "./pages/ProfilePage";
 
-
-// 🔐 simple auth guard
-const getUser = () => {
-  try {
-    return JSON.parse(localStorage.getItem("cmdi_user") || "null");
-  } catch {
-    return null;
-  }
-};
-
 import { useAuth } from "./context/AuthContext";
 
+// AUTH GUARD
 const ProtectedRoute = ({ children, role }: any) => {
   const { user, loading } = useAuth();
 
@@ -52,13 +43,13 @@ const ProtectedRoute = ({ children, role }: any) => {
 };
 
 export const router = createBrowserRouter([
-  // LOGIN
+  // ================= LOGIN =================
   {
     path: "/",
     element: <LoginPage />,
   },
 
-  // STUDENT
+  // ================= STUDENT =================
   {
     path: "/student",
     element: (
@@ -72,7 +63,7 @@ export const router = createBrowserRouter([
   { path: "/student/tuition", element: <TuitionPage /> },
   { path: "/student/evaluation", element: <EvaluationPage /> },
 
-  // TEACHER
+  // ================= TEACHER =================
   {
     path: "/teacher",
     element: (
@@ -86,7 +77,7 @@ export const router = createBrowserRouter([
   { path: "/teacher/students", element: <StudentListPage /> },
   { path: "/teacher/evaluation", element: <EvaluationPage /> },
 
-  // ADMIN
+  // ================= ADMIN =================
   {
     path: "/admin",
     element: (
@@ -102,7 +93,7 @@ export const router = createBrowserRouter([
   { path: "/admin/grades", element: <GradesPage /> },
   { path: "/admin/financial", element: <TuitionPage /> },
 
-  // FINANCE
+  // ================= FINANCE =================
   {
     path: "/finance",
     element: (
@@ -111,18 +102,9 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  {
-    path: "/finance/students",
-    element: <FinanceStudentAccountsPage />,
-  },
-  {
-    path: "/finance/payments",
-    element: <FinancePaymentsBillingPage />,
-  },
-  {
-    path: "/finance/reports",
-    element: <FinanceReportsPage />,
-  },
+  { path: "/finance/students", element: <FinanceStudentAccountsPage /> },
+  { path: "/finance/payments", element: <FinancePaymentsBillingPage /> },
+  { path: "/finance/reports", element: <FinanceReportsPage /> },
   {
     path: "/finance/notifications",
     element: (
@@ -136,7 +118,7 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // REGISTRAR
+  // ================= REGISTRAR =================
   {
     path: "/registrar",
     element: (
@@ -145,36 +127,17 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  {
-    path: "/registrar/students",
-    element: <RegistrarStudentRecordsPage />,
-  },
-  {
-    path: "/registrar/enrollment",
-    element: <EnrollmentPage />,
-  },
-  {
-    path: "/registrar/grades",
-    element: <GradesPage />,
-  },
-  {
-    path: "/registrar/courses",
-    element: <CourseManagementPage />,
-  },
-  {
-    path: "/registrar/notifications",
-    element: (
-      <NotificationsPage userRole="registrar" userName="Registrar Officer" />
-    ),
-  },
-  {
-    path: "/registrar/profile",
-    element: (
-      <ProfilePage userRole="registrar" userName="Registrar Officer" />
-    ),
-  },
 
-  // FALLBACK (IMPORTANT FIX)
+  // existing working pages
+  { path: "/registrar/students", element: <RegistrarStudentRecordsPage /> },
+  { path: "/registrar/enrollment", element: <EnrollmentPage /> },
+
+  // 🔥 NEW FIXED PAGES (YOU WERE MISSING THESE)
+  { path: "/registrar/subjects", element: <CourseManagementPage /> },
+  { path: "/registrar/reports", element: <AnalyticsPage /> },
+  { path: "/registrar/settings", element: <ProfilePage userRole="registrar" userName="Registrar Officer" /> },
+
+  // ================= FALLBACK =================
   {
     path: "*",
     element: <Navigate to="/" />,

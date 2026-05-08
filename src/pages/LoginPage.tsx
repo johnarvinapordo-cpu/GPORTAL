@@ -48,6 +48,7 @@ setUser(data.user);
       setUser(normalizedUser);
 
       console.log("LOGIN SUCCESS:", normalizedUser);
+      console.log("LOGIN ROLE FROM BACKEND:", data.user.role);
 
       // redirect by role
       switch (normalizedUser.role) {
