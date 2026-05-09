@@ -15,77 +15,58 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const data = await apiRequest("/api/login", {
-        method: "POST",
-        body: JSON.stringify({
-          userId: email,
-          password,
-        }),
-      });
+  try {
+    const data = await apiRequest("/api/login", {
+      method: "POST",
+      body: JSON.stringify({
+        userId: email,
+        password,
+      }),
+    });
 
-      // normalize role
-      const normalizedUser = {
-        ...data.user,
-        role: data.user.role.toLowerCase(),
-      };
+    const normalizedUser = {
+      ...data.user,
+      role: data.user.role.toLowerCase().trim(),
+    };
 
-      // save session
-     
-storeSession({
-  token: data.token,
-  user: data.user,
-});
+    storeSession({
+      token: data.token,
+      user: normalizedUser,
+    });
 
-// IMPORTANT: update React context
-setUser(data.user);
+    setUser(normalizedUser); // ✅ ONLY ONCE
 
-      // update auth context
-      setUser(normalizedUser);
-
-      console.log("LOGIN SUCCESS:", normalizedUser);
-      console.log("LOGIN ROLE FROM BACKEND:", data.user.role);
-
-      // redirect by role
-      switch (normalizedUser.role) {
-        case "student":
-          navigate("/student");
-          break;
-
-        case "teacher":
-          navigate("/teacher");
-          break;
-
-        case "admin":
-          navigate("/admin");
-          break;
-
-        case "finance":
-          navigate("/finance");
-          break;
-
-        case "registrar":
-          navigate("/registrar");
-          break;
-
-        default:
-          navigate("/");
-      }
-    } catch (err: any) {
-      console.error("LOGIN ERROR:", err);
-
-      alert(
-        err.message ||
-          "Login failed. Backend server not reachable."
-      );
-    } finally {
-      setLoading(false);
+    switch (normalizedUser.role) {
+      case "student":
+        navigate("/student");
+        break;
+      case "teacher":
+        navigate("/teacher");
+        break;
+      case "admin":
+        navigate("/admin");
+        break;
+      case "finance":
+        navigate("/finance");
+        break;
+      case "registrar":
+        navigate("/registrar");
+        break;
+      default:
+        navigate("/");
     }
-  };
+
+  } catch (err) {
+    console.error(err);
+    alert("Login failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

@@ -13,7 +13,6 @@ import {
   BarChart3,
   Settings,
   FileText,
-  Calendar,
   Menu,
   X,
 } from "lucide-react";
@@ -42,224 +41,74 @@ export default function DashboardLayout({
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // 🔥 FORCE SINGLE SOURCE OF TRUTH
   const storedUser = (() => {
-  try {
-    return JSON.parse(localStorage.getItem("cmdi_user") || "null");
-  } catch {
-    return null;
-  }
-})();
+    try {
+      return JSON.parse(localStorage.getItem("cmdi_user") || "null");
+    } catch {
+      return null;
+    }
+  })();
 
-const role =
-  (storedUser?.role ?? userRole ?? "student")
-    .toLowerCase()
-    .trim();
+  const role =
+    (storedUser?.role || userRole || "student")
+      .toString()
+      .toLowerCase()
+      .trim();
 
-const name = storedUser?.name ?? userName ?? "User";
+  const name = storedUser?.name ?? userName ?? "User";
 
-  // DEBUG (KEEP THIS UNTIL EVERYTHING WORKS)
   useEffect(() => {
     console.log("ACTIVE ROLE:", role);
   }, [role]);
 
-  // ================= NAV ITEMS =================
-
-  // ===================== STUDENT =====================
-const studentNavItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
-    path: "/student",
-  },
-
-  {
-    label: "Enrollment",
-    icon: <BookOpen className="w-5 h-5" />,
-    path: "/student/enrollment",
-  },
-
-  {
-    label: "Grades",
-    icon: <GraduationCap className="w-5 h-5" />,
-    path: "/student/grades",
-  },
-
-  {
-    label: "Finance",
-    icon: <DollarSign className="w-5 h-5" />,
-    path: "/student/tuition",
-  },
-
-  {
-    label: "Evaluation",
-    icon: <ClipboardCheck className="w-5 h-5" />,
-    path: "/student/evaluation",
-  },
-
-  {
-    label: "Reports",
-    icon: <BarChart3 className="w-5 h-5" />,
-    path: "/student/reports",
-  },
-
-  {
-    label: "Settings",
-    icon: <Settings className="w-5 h-5" />,
-    path: "/student/settings",
-  },
-
-  // KEEP THESE SO THEY STILL WORK
-  {
-    label: "Notifications",
-    icon: <Bell className="w-5 h-5" />,
-    path: "/student/notifications",
-  },
-
-  {
-    label: "Profile",
-    icon: <User className="w-5 h-5" />,
-    path: "/student/profile",
-  },
-];
-
-  // ===================== TEACHER =====================
-const teacherNavItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
-    path: "/teacher",
-  },
-
-  {
-    label: "Courses",
-    icon: <BookOpen className="w-5 h-5" />,
-    path: "/teacher/courses",
-  },
-
-  {
-    label: "Grades",
-    icon: <GraduationCap className="w-5 h-5" />,
-    path: "/teacher/grades",
-  },
-
-  {
-    label: "Students",
-    icon: <Users className="w-5 h-5" />,
-    path: "/teacher/students",
-  },
-
-  {
-    label: "Evaluation",
-    icon: <ClipboardCheck className="w-5 h-5" />,
-    path: "/teacher/evaluation",
-  },
-
-  {
-    label: "Reports",
-    icon: <BarChart3 className="w-5 h-5" />,
-    path: "/teacher/reports",
-  },
-
-  {
-    label: "Notifications",
-    icon: <Bell className="w-5 h-5" />,
-    path: "/teacher/notifications",
-  },
-
-  {
-    label: "Profile",
-    icon: <User className="w-5 h-5" />,
-    path: "/teacher/profile",
-  },
-
-  {
-    label: "Settings",
-    icon: <Settings className="w-5 h-5" />,
-    path: "/teacher/settings",
-  },
-];
-
-   // ===================== ADMIN =====================
-const adminNavItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    icon: <LayoutDashboard className="w-5 h-5" />,
-    path: "/admin",
-  },
-
-  {
-    label: "Students",
-    icon: <Users className="w-5 h-5" />,
-    path: "/admin/students",
-  },
-
-  {
-    label: "Courses",
-    icon: <BookOpen className="w-5 h-5" />,
-    path: "/admin/courses",
-  },
-
-  {
-    label: "Enrollment",
-    icon: <ClipboardCheck className="w-5 h-5" />,
-    path: "/admin/enrollment",
-  },
-
-  {
-    label: "Grades",
-    icon: <GraduationCap className="w-5 h-5" />,
-    path: "/admin/grades",
-  },
-
-  {
-    label: "Finance",
-    icon: <DollarSign className="w-5 h-5" />,
-    path: "/admin/financial",
-  },
-
-  {
-    label: "Analytics",
-    icon: <BarChart3 className="w-5 h-5" />,
-    path: "/admin/analytics",
-  },
-
-  {
-    label: "Reports",
-    icon: <FileText className="w-5 h-5" />,
-    path: "/admin/reports",
-  },
-
-  {
-    label: "Notifications",
-    icon: <Bell className="w-5 h-5" />,
-    path: "/admin/notifications",
-  },
-
-  {
-    label: "Profile",
-    icon: <User className="w-5 h-5" />,
-    path: "/admin/profile",
-  },
-
-  {
-    label: "Settings",
-    icon: <Settings className="w-5 h-5" />,
-    path: "/admin/settings",
-  },
-];
-
-  const financeNavItems: NavItem[] = [
-    { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/finance" },
-    { label: "Student Accounts", icon: <Users className="w-5 h-5" />, path: "/finance/students" },
-    { label: "Payments & Billing", icon: <DollarSign className="w-5 h-5" />, path: "/finance/payments" },
-    { label: "Financial Reports", icon: <FileText className="w-5 h-5" />, path: "/finance/reports" },
-    { label: "Notifications", icon: <Bell className="w-5 h-5" />, path: "/finance/notifications" },
-    { label: "Profile", icon: <User className="w-5 h-5" />, path: "/finance/profile" },
+  const studentNavItems: NavItem[] = [
+    { label: "Dashboard", icon: <LayoutDashboard />, path: "/student" },
+    { label: "Enrollment", icon: <BookOpen />, path: "/student/enrollment" },
+    { label: "Grades", icon: <GraduationCap />, path: "/student/grades" },
+    { label: "Finance", icon: <DollarSign />, path: "/student/tuition" },
+    { label: "Evaluation", icon: <ClipboardCheck />, path: "/student/evaluation" },
+    { label: "Reports", icon: <BarChart3 />, path: "/student/reports" },
+    { label: "Settings", icon: <Settings />, path: "/student/settings" },
+    { label: "Notifications", icon: <Bell />, path: "/student/notifications" },
+    { label: "Profile", icon: <User />, path: "/student/profile" },
   ];
 
+  const teacherNavItems: NavItem[] = [
+    { label: "Dashboard", icon: <LayoutDashboard />, path: "/teacher" },
+    { label: "Courses", icon: <BookOpen />, path: "/teacher/courses" },
+    { label: "Grades", icon: <GraduationCap />, path: "/teacher/grades" },
+    { label: "Students", icon: <Users />, path: "/teacher/students" },
+    { label: "Evaluation", icon: <ClipboardCheck />, path: "/teacher/evaluation" },
+    { label: "Reports", icon: <BarChart3 />, path: "/teacher/reports" },
+    { label: "Settings", icon: <Settings />, path: "/teacher/settings" },
+    { label: "Notifications", icon: <Bell />, path: "/teacher/notifications" },
+    { label: "Profile", icon: <User />, path: "/teacher/profile" },
+  ];
 
-  // ✅ FINAL REGISTRAR SIDEBAR (YOUR REQUEST EXACTLY)
+  const adminNavItems: NavItem[] = [
+    { label: "Dashboard", icon: <LayoutDashboard />, path: "/admin" },
+    { label: "Students", icon: <Users />, path: "/admin/students" },
+    { label: "Courses", icon: <BookOpen />, path: "/admin/courses" },
+    { label: "Enrollment", icon: <ClipboardCheck />, path: "/admin/enrollment" },
+    { label: "Grades", icon: <GraduationCap />, path: "/admin/grades" },
+    { label: "Finance", icon: <DollarSign />, path: "/admin/financial" },
+    { label: "Analytics", icon: <BarChart3 />, path: "/admin/analytics" },
+    { label: "Reports", icon: <FileText />, path: "/admin/reports" },
+    { label: "Settings", icon: <Settings />, path: "/admin/settings" },
+    { label: "Notifications", icon: <Bell />, path: "/admin/notifications" },
+    { label: "Profile", icon: <User />, path: "/admin/profile" },
+  ];
+
+  const financeNavItems: NavItem[] = [
+    { label: "Dashboard", icon: <LayoutDashboard />, path: "/finance" },
+    { label: "Students", icon: <Users />, path: "/finance/students" },
+    { label: "Payments", icon: <DollarSign />, path: "/finance/payments" },
+    { label: "Reports", icon: <FileText />, path: "/finance/reports" },
+    { label: "Settings", icon: <Settings />, path: "/finance/settings" },
+    { label: "Notifications", icon: <Bell />, path: "/finance/notifications" },
+    { label: "Profile", icon: <User />, path: "/finance/profile" },
+  ];
+
   const registrarNavItems: NavItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard />, path: "/registrar" },
     { label: "Enrollment", icon: <Users />, path: "/registrar/enrollment" },
@@ -269,38 +118,15 @@ const adminNavItems: NavItem[] = [
     { label: "Settings", icon: <Settings />, path: "/registrar/settings" },
   ];
 
-  // ================= ROLE FIX =================
-  let navItems: NavItem[];
+  const navItems =
+    {
+      student: studentNavItems,
+      teacher: teacherNavItems,
+      admin: adminNavItems,
+      finance: financeNavItems,
+      registrar: registrarNavItems,
+    }[role] || [];
 
-switch (role) {
-  case "student":
-    navItems = studentNavItems;
-    break;
-
-  case "teacher":
-    navItems = teacherNavItems;
-    break;
-
-  case "admin":
-    navItems = adminNavItems;
-    break;
-
-  case "finance":
-    navItems = financeNavItems;
-    break;
-
-  case "registrar":
-    navItems = registrarNavItems;
-    break;
-
-  default:
-    console.warn("UNKNOWN ROLE DETECTED:", role);
-    navItems = [];
-}
-if (!role) {
-  console.error("ROLE IS EMPTY — forcing logout");
-  navigate("/");
-}
   const handleLogout = () => {
     localStorage.removeItem("cmdi_user");
     navigate("/");
@@ -313,15 +139,13 @@ if (!role) {
       <aside className={`fixed left-0 top-0 h-full bg-white border-r z-40 transition-transform
         ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 w-64`}>
 
-        {/* HEADER */}
         <div className="p-6 border-b">
-          <h1 className="text-lg font-bold text-gray-900">
-            {role === "registrar" ? "CMDI Portal Registrar" : "CMDI Portal"}
+          <h1 className="text-lg font-bold">
+            CMDI Portal
           </h1>
           <p className="text-xs text-gray-500 capitalize">{role}</p>
         </div>
 
-        {/* NAV */}
         <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-220px)]">
           {navItems.map((item) => (
             <button
@@ -333,7 +157,7 @@ if (!role) {
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm",
                 location.pathname === item.path
-                  ? "bg-blue-50 text-blue-600 font-medium"
+                  ? "bg-blue-50 text-blue-600"
                   : "text-gray-700 hover:bg-gray-100"
               )}
             >
@@ -343,11 +167,8 @@ if (!role) {
           ))}
         </nav>
 
-        {/* USER */}
         <div className="absolute bottom-0 w-full p-4 border-t">
           <p className="text-sm font-medium">{name}</p>
-          <p className="text-xs text-gray-500 capitalize">{role}</p>
-
           <Button onClick={handleLogout} className="w-full mt-3">
             <LogOut className="w-4 h-4 mr-2" />
             Logout
@@ -363,14 +184,11 @@ if (!role) {
               {sidebarOpen ? <X /> : <Menu />}
             </button>
 
-            <h2 className="font-semibold text-gray-800">
+            <h2 className="font-semibold">
               CARD-MRI Development Institute Inc.
             </h2>
 
-            <div className="flex items-center gap-3">
-              <User className="w-5 h-5" />
-              <span className="text-sm">{name}</span>
-            </div>
+            <span className="text-sm">{name}</span>
           </div>
         </header>
 
