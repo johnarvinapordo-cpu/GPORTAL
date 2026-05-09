@@ -61,32 +61,97 @@ export default function DashboardLayout({
 
   // ================= NAV ITEMS =================
 
-  const studentNavItems: NavItem[] = [
-  { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/student" },
-  { label: "Enrollment", icon: <BookOpen className="w-5 h-5" />, path: "/student/enrollment" },
-  { label: "Grades", icon: <GraduationCap className="w-5 h-5" />, path: "/student/grades" },
-  { label: "Tuition / Payments", icon: <DollarSign className="w-5 h-5" />, path: "/student/tuition" },
-  { label: "Evaluations", icon: <ClipboardCheck className="w-5 h-5" />, path: "/student/evaluation" },
-  { label: "Notifications", icon: <Bell className="w-5 h-5" />, path: "/student/notifications" },
-  { label: "Profile", icon: <User className="w-5 h-5" />, path: "/student/profile" },
+  // ===================== STUDENT =====================
+const studentNavItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    icon: <LayoutDashboard className="w-5 h-5" />,
+    path: "/student",
+  },
+
+  {
+    label: "Enrollment",
+    icon: <BookOpen className="w-5 h-5" />,
+    path: "/student/enrollment",
+  },
+
+  {
+    label: "Grades",
+    icon: <GraduationCap className="w-5 h-5" />,
+    path: "/student/grades",
+  },
+
+  {
+    label: "Finance",
+    icon: <DollarSign className="w-5 h-5" />,
+    path: "/student/tuition",
+  },
+
+  {
+    label: "Evaluation",
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    path: "/student/evaluation",
+  },
+
+  {
+    label: "Reports",
+    icon: <BarChart3 className="w-5 h-5" />,
+    path: "/student/reports",
+  },
+
+  {
+    label: "Settings",
+    icon: <Settings className="w-5 h-5" />,
+    path: "/student/settings",
+  },
+
+  // KEEP THESE SO THEY STILL WORK
+  {
+    label: "Notifications",
+    icon: <Bell className="w-5 h-5" />,
+    path: "/student/notifications",
+  },
+
+  {
+    label: "Profile",
+    icon: <User className="w-5 h-5" />,
+    path: "/student/profile",
+  },
 ];
 
   const teacherNavItems: NavItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/teacher" },
-    { label: "Courses", icon: <BookOpen className="w-5 h-5" />, path: "/teacher/courses" },
-    { label: "Students", icon: <Users className="w-5 h-5" />, path: "/teacher/students" },
+    { label: "My Courses", icon: <BookOpen className="w-5 h-5" />, path: "/teacher/courses" },
+    { label: "Enter Grades", icon: <GraduationCap className="w-5 h-5" />, path: "/teacher/grades" },
+    { label: "Student List", icon: <Users className="w-5 h-5" />, path: "/teacher/students" },
+    { label: "Evaluations", icon: <ClipboardCheck className="w-5 h-5" />, path: "/teacher/evaluation" },
+    { label: "Notifications", icon: <Bell className="w-5 h-5" />, path: "/teacher/notifications" },
+    { label: "Profile", icon: <User className="w-5 h-5" />, path: "/teacher/profile" },
   ];
 
-  const adminNavItems: NavItem[] = [
+   const adminNavItems: NavItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/admin" },
-    { label: "Students", icon: <Users className="w-5 h-5" />, path: "/admin/students" },
+    { label: "Student Management", icon: <Users className="w-5 h-5" />, path: "/admin/students" },
+    { label: "Teacher Management", icon: <User className="w-5 h-5" />, path: "/admin/teachers" },
+    { label: "Course Management", icon: <BookOpen className="w-5 h-5" />, path: "/admin/courses" },
+    { label: "Enrollment Management", icon: <Calendar className="w-5 h-5" />, path: "/admin/enrollment" },
+    { label: "Grades Management", icon: <GraduationCap className="w-5 h-5" />, path: "/admin/grades" },
+    { label: "Financial Services", icon: <DollarSign className="w-5 h-5" />, path: "/admin/financial" },
+    { label: "Evaluations", icon: <ClipboardCheck className="w-5 h-5" />, path: "/admin/evaluations" },
     { label: "Reports", icon: <FileText className="w-5 h-5" />, path: "/admin/reports" },
+    { label: "Analytics", icon: <BarChart3 className="w-5 h-5" />, path: "/admin/analytics" },
+    { label: "System Settings", icon: <Settings className="w-5 h-5" />, path: "/admin/settings" },
   ];
 
   const financeNavItems: NavItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/finance" },
-    { label: "Payments", icon: <DollarSign className="w-5 h-5" />, path: "/finance/payments" },
+    { label: "Student Accounts", icon: <Users className="w-5 h-5" />, path: "/finance/students" },
+    { label: "Payments & Billing", icon: <DollarSign className="w-5 h-5" />, path: "/finance/payments" },
+    { label: "Financial Reports", icon: <FileText className="w-5 h-5" />, path: "/finance/reports" },
+    { label: "Notifications", icon: <Bell className="w-5 h-5" />, path: "/finance/notifications" },
+    { label: "Profile", icon: <User className="w-5 h-5" />, path: "/finance/profile" },
   ];
+
 
   // ✅ FINAL REGISTRAR SIDEBAR (YOUR REQUEST EXACTLY)
   const registrarNavItems: NavItem[] = [

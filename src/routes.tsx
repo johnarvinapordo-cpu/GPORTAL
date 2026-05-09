@@ -170,4 +170,42 @@ export const router = createBrowserRouter([
     path: "*",
     element: <Navigate to="/" />,
   },
+
+  // ================= STUDENT EXTRA PAGES =================
+{
+  path: "/student/notifications",
+  element: (
+    <NotificationsPage
+      userRole="student"
+      userName="Student"
+    />
+  ),
+},
+
+{
+  path: "/student/profile",
+  element: (
+    <ProfilePage
+      userRole="student"
+      userName="Student"
+    />
+  ),
+},
+
+{
+  path: "/student/reports",
+  element: (
+    <AnalyticsPage />
+  ),
+},
+
+{
+  path: "/student/settings",
+  element: (
+    <ProfilePage
+      userRole="student"
+      userName="Student"
+    />
+  ),
+},
 ]);
