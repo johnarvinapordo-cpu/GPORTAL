@@ -332,36 +332,28 @@ return (
           />
         )}
 
-        {activeTab === 'reports' && (
-          <FormCard title="System Reports">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-center">
-                <FileText className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900">User Activity Report</p>
-              </button>
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
-                <FileText className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900">Enrollment Report</p>
-              </button>
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors text-center">
-                <FileText className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900">Financial Report</p>
-              </button>
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors text-center">
-                <FileText className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900">Academic Report</p>
-              </button>
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-colors text-center">
-                <FileText className="w-8 h-8 text-red-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900">System Health Report</p>
-              </button>
-              <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors text-center">
-                <FileText className="w-8 h-8 text-indigo-600 mx-auto mb-2" />
-                <p className="text-sm font-medium text-gray-900">Audit Log Report</p>
-              </button>
-            </div>
-          </FormCard>
-        )}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+  <h3 className="text-lg font-semibold mb-4">System Reports</h3>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors text-left">
+      <FileText className="w-8 h-8 text-orange-600 mb-2" />
+      <p className="text-sm font-medium">Enrollment Report</p>
+    </button>
+
+    <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-colors text-left">
+      <FileText className="w-8 h-8 text-red-600 mb-2" />
+      <p className="text-sm font-medium">Audit Logs</p>
+    </button>
+
+    <button className="p-6 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-colors text-left">
+      <FileText className="w-8 h-8 text-indigo-600 mb-2" />
+      <p className="text-sm font-medium">System Health</p>
+    </button>
+
+  </div>
+</div>
 
         {activeTab === 'settings' && (
           <div className="space-y-6">

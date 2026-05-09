@@ -27,6 +27,10 @@ import RegistrarStudentRecordsPage from "./pages/RegistrarStudentRecordsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ProfilePage from "./pages/ProfilePage";
 
+// ✅ NEW IMPORT (FIX)
+import AdminReportsPage from "./pages/AdminReportsPage";
+import AdminProfilePage from "./pages/AdminProfilePage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
 import { useAuth } from "./context/AuthContext";
 
 // AUTH GUARD
@@ -45,6 +49,7 @@ const ProtectedRoute = ({ children, role }: any) => {
 };
 
 export const router = createBrowserRouter([
+
   // ================= LOGIN =================
   {
     path: "/",
@@ -79,6 +84,32 @@ export const router = createBrowserRouter([
   { path: "/teacher/students", element: <StudentListPage /> },
   { path: "/teacher/evaluation", element: <EvaluationPage /> },
 
+  {
+    path: "/teacher/reports",
+    element: <AnalyticsPage />,
+  },
+
+  {
+    path: "/teacher/notifications",
+    element: (
+      <NotificationsPage userRole="teacher" userName="Teacher" />
+    ),
+  },
+
+  {
+    path: "/teacher/profile",
+    element: (
+      <ProfilePage userRole="teacher" userName="Teacher" />
+    ),
+  },
+
+  {
+    path: "/teacher/settings",
+    element: (
+      <ProfilePage userRole="teacher" userName="Teacher" />
+    ),
+  },
+
   // ================= ADMIN =================
   {
     path: "/admin",
@@ -88,12 +119,36 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+
   { path: "/admin/analytics", element: <AnalyticsPage /> },
+
   { path: "/admin/students", element: <StudentListPage /> },
   { path: "/admin/courses", element: <CourseManagementPage /> },
   { path: "/admin/enrollment", element: <EnrollmentPage /> },
   { path: "/admin/grades", element: <GradesPage /> },
   { path: "/admin/financial", element: <TuitionPage /> },
+
+  // ✅ FIXED: REAL SEPARATE REPORT PAGE
+  {
+    path: "/admin/reports",
+    element: <AdminReportsPage />,
+  },
+
+  {
+    path: "/admin/notifications",
+    element: (
+      <NotificationsPage userRole="admin" userName="Administrator" />
+    ),
+  },
+
+{
+  path: "/admin/profile",
+  element: <AdminProfilePage />,
+},
+{
+  path: "/admin/settings",
+  element: <AdminSettingsPage />,
+},
 
   // ================= FINANCE =================
   {
@@ -111,20 +166,14 @@ export const router = createBrowserRouter([
   {
     path: "/finance/notifications",
     element: (
-      <NotificationsPage
-        userRole="finance"
-        userName="Finance Officer"
-      />
+      <NotificationsPage userRole="finance" userName="Finance Officer" />
     ),
   },
 
   {
     path: "/finance/profile",
     element: (
-      <ProfilePage
-        userRole="finance"
-        userName="Finance Officer"
-      />
+      <ProfilePage userRole="finance" userName="Finance Officer" />
     ),
   },
 
@@ -158,10 +207,34 @@ export const router = createBrowserRouter([
   {
     path: "/registrar/settings",
     element: (
-      <ProfilePage
-        userRole="registrar"
-        userName="Registrar Officer"
-      />
+      <ProfilePage userRole="registrar" userName="Registrar Officer" />
+    ),
+  },
+
+  // ================= STUDENT EXTRA PAGES =================
+  {
+    path: "/student/notifications",
+    element: (
+      <NotificationsPage userRole="student" userName="Student" />
+    ),
+  },
+
+  {
+    path: "/student/profile",
+    element: (
+      <ProfilePage userRole="student" userName="Student" />
+    ),
+  },
+
+  {
+    path: "/student/reports",
+    element: <AnalyticsPage />,
+  },
+
+  {
+    path: "/student/settings",
+    element: (
+      <ProfilePage userRole="student" userName="Student" />
     ),
   },
 
@@ -170,42 +243,4 @@ export const router = createBrowserRouter([
     path: "*",
     element: <Navigate to="/" />,
   },
-
-  // ================= STUDENT EXTRA PAGES =================
-{
-  path: "/student/notifications",
-  element: (
-    <NotificationsPage
-      userRole="student"
-      userName="Student"
-    />
-  ),
-},
-
-{
-  path: "/student/profile",
-  element: (
-    <ProfilePage
-      userRole="student"
-      userName="Student"
-    />
-  ),
-},
-
-{
-  path: "/student/reports",
-  element: (
-    <AnalyticsPage />
-  ),
-},
-
-{
-  path: "/student/settings",
-  element: (
-    <ProfilePage
-      userRole="student"
-      userName="Student"
-    />
-  ),
-},
 ]);

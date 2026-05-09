@@ -119,29 +119,131 @@ const studentNavItems: NavItem[] = [
   },
 ];
 
-  const teacherNavItems: NavItem[] = [
-    { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/teacher" },
-    { label: "My Courses", icon: <BookOpen className="w-5 h-5" />, path: "/teacher/courses" },
-    { label: "Enter Grades", icon: <GraduationCap className="w-5 h-5" />, path: "/teacher/grades" },
-    { label: "Student List", icon: <Users className="w-5 h-5" />, path: "/teacher/students" },
-    { label: "Evaluations", icon: <ClipboardCheck className="w-5 h-5" />, path: "/teacher/evaluation" },
-    { label: "Notifications", icon: <Bell className="w-5 h-5" />, path: "/teacher/notifications" },
-    { label: "Profile", icon: <User className="w-5 h-5" />, path: "/teacher/profile" },
-  ];
+  // ===================== TEACHER =====================
+const teacherNavItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    icon: <LayoutDashboard className="w-5 h-5" />,
+    path: "/teacher",
+  },
 
-   const adminNavItems: NavItem[] = [
-    { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/admin" },
-    { label: "Student Management", icon: <Users className="w-5 h-5" />, path: "/admin/students" },
-    { label: "Teacher Management", icon: <User className="w-5 h-5" />, path: "/admin/teachers" },
-    { label: "Course Management", icon: <BookOpen className="w-5 h-5" />, path: "/admin/courses" },
-    { label: "Enrollment Management", icon: <Calendar className="w-5 h-5" />, path: "/admin/enrollment" },
-    { label: "Grades Management", icon: <GraduationCap className="w-5 h-5" />, path: "/admin/grades" },
-    { label: "Financial Services", icon: <DollarSign className="w-5 h-5" />, path: "/admin/financial" },
-    { label: "Evaluations", icon: <ClipboardCheck className="w-5 h-5" />, path: "/admin/evaluations" },
-    { label: "Reports", icon: <FileText className="w-5 h-5" />, path: "/admin/reports" },
-    { label: "Analytics", icon: <BarChart3 className="w-5 h-5" />, path: "/admin/analytics" },
-    { label: "System Settings", icon: <Settings className="w-5 h-5" />, path: "/admin/settings" },
-  ];
+  {
+    label: "Courses",
+    icon: <BookOpen className="w-5 h-5" />,
+    path: "/teacher/courses",
+  },
+
+  {
+    label: "Grades",
+    icon: <GraduationCap className="w-5 h-5" />,
+    path: "/teacher/grades",
+  },
+
+  {
+    label: "Students",
+    icon: <Users className="w-5 h-5" />,
+    path: "/teacher/students",
+  },
+
+  {
+    label: "Evaluation",
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    path: "/teacher/evaluation",
+  },
+
+  {
+    label: "Reports",
+    icon: <BarChart3 className="w-5 h-5" />,
+    path: "/teacher/reports",
+  },
+
+  {
+    label: "Notifications",
+    icon: <Bell className="w-5 h-5" />,
+    path: "/teacher/notifications",
+  },
+
+  {
+    label: "Profile",
+    icon: <User className="w-5 h-5" />,
+    path: "/teacher/profile",
+  },
+
+  {
+    label: "Settings",
+    icon: <Settings className="w-5 h-5" />,
+    path: "/teacher/settings",
+  },
+];
+
+   // ===================== ADMIN =====================
+const adminNavItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    icon: <LayoutDashboard className="w-5 h-5" />,
+    path: "/admin",
+  },
+
+  {
+    label: "Students",
+    icon: <Users className="w-5 h-5" />,
+    path: "/admin/students",
+  },
+
+  {
+    label: "Courses",
+    icon: <BookOpen className="w-5 h-5" />,
+    path: "/admin/courses",
+  },
+
+  {
+    label: "Enrollment",
+    icon: <ClipboardCheck className="w-5 h-5" />,
+    path: "/admin/enrollment",
+  },
+
+  {
+    label: "Grades",
+    icon: <GraduationCap className="w-5 h-5" />,
+    path: "/admin/grades",
+  },
+
+  {
+    label: "Finance",
+    icon: <DollarSign className="w-5 h-5" />,
+    path: "/admin/financial",
+  },
+
+  {
+    label: "Analytics",
+    icon: <BarChart3 className="w-5 h-5" />,
+    path: "/admin/analytics",
+  },
+
+  {
+    label: "Reports",
+    icon: <FileText className="w-5 h-5" />,
+    path: "/admin/reports",
+  },
+
+  {
+    label: "Notifications",
+    icon: <Bell className="w-5 h-5" />,
+    path: "/admin/notifications",
+  },
+
+  {
+    label: "Profile",
+    icon: <User className="w-5 h-5" />,
+    path: "/admin/profile",
+  },
+
+  {
+    label: "Settings",
+    icon: <Settings className="w-5 h-5" />,
+    path: "/admin/settings",
+  },
+];
 
   const financeNavItems: NavItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/finance" },
@@ -175,6 +277,10 @@ switch (role) {
     navItems = teacherNavItems;
     break;
 
+  case "admin":
+    navItems = adminNavItems;
+    break;
+
   case "finance":
     navItems = financeNavItems;
     break;
@@ -184,7 +290,6 @@ switch (role) {
     break;
 
   default:
-    // ❌ NO ADMIN FALLBACK FOR REGISTRAR BUG PROTECTION
     console.warn("UNKNOWN ROLE DETECTED:", role);
     navItems = [];
 }
@@ -213,7 +318,7 @@ if (!role) {
         </div>
 
         {/* NAV */}
-        <nav className="p-3 space-y-1">
+        <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-220px)]">
           {navItems.map((item) => (
             <button
               key={item.path}
