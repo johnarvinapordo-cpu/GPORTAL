@@ -8,6 +8,8 @@ import {
   Eye,
 } from "lucide-react";
 
+import DashboardLayout from "../components/layout/DashboardLayout";
+
 type EnrollmentStatus = "pending" | "approved" | "rejected";
 
 interface Enrollment {
@@ -23,7 +25,7 @@ export default function RegistrarEnrollmentPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  const enrollments: Enrollment[] = [
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([
     {
       id: "ENR-001",
       studentName: "Juan Dela Cruz",
@@ -48,15 +50,20 @@ export default function RegistrarEnrollmentPage() {
       status: "rejected",
       date: "2026-05-03",
     },
-  ];
+  ]);
+
+  const updateStatus = (id: string, status: EnrollmentStatus) => {
+    setEnrollments((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status } : e))
+    );
+  };
 
   const filtered = enrollments.filter((e) => {
     const matchesSearch =
       e.studentName.toLowerCase().includes(search.toLowerCase()) ||
       e.course.toLowerCase().includes(search.toLowerCase());
 
-    const matchesFilter =
-      filter === "all" || e.status === filter;
+    const matchesFilter = filter === "all" || e.status === filter;
 
     return matchesSearch && matchesFilter;
   });
@@ -89,93 +96,101 @@ export default function RegistrarEnrollmentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 space-y-6">
+    <DashboardLayout userRole="registrar" userName="Registrar Officer">
+      <div className="space-y-6">
 
-      {/* HEADER */}
-      <div>
-        <h1 className="text-2xl font-bold">
-          Enrollment Management
-        </h1>
-
-        <p className="text-sm text-gray-500">
-          Registrar enrollment processing dashboard
-        </p>
-      </div>
-
-      {/* FILTERS */}
-      <div className="bg-white rounded-xl shadow p-4 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
-
-        {/* SEARCH */}
-        <div className="flex items-center gap-2 border rounded-lg px-3 py-2 w-full md:w-1/2">
-          <Search className="w-4 h-4 text-gray-400" />
-
-          <input
-            type="text"
-            placeholder="Search student or course..."
-            className="w-full outline-none text-sm"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        {/* HEADER */}
+        <div>
+          <h1 className="text-2xl font-bold">Enrollment Management</h1>
+          <p className="text-sm text-gray-500">
+            Approve or reject student enrollment requests
+          </p>
         </div>
 
-        {/* FILTER */}
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400" />
+        {/* FILTERS */}
+        <div className="bg-white rounded-xl shadow p-4 flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
 
-          <select
-            className="border rounded-lg px-3 py-2 text-sm"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-          </select>
+          {/* SEARCH */}
+          <div className="flex items-center gap-2 border rounded-lg px-3 py-2 w-full md:w-1/2">
+            <Search className="w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search student or course..."
+              className="w-full outline-none text-sm"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* FILTER */}
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-400" />
+            <select
+              className="border rounded-lg px-3 py-2 text-sm"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
-
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-600 text-left">
-            <tr>
-              <th className="p-4">ID</th>
-              <th className="p-4">Student</th>
-              <th className="p-4">Course</th>
-              <th className="p-4">Year</th>
-              <th className="p-4">Status</th>
-              <th className="p-4">Date</th>
-              <th className="p-4 text-right">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filtered.map((e) => (
-              <tr
-                key={e.id}
-                className="border-t hover:bg-gray-50 transition"
-              >
-                <td className="p-4 font-medium">{e.id}</td>
-                <td className="p-4">{e.studentName}</td>
-                <td className="p-4">{e.course}</td>
-                <td className="p-4">{e.yearLevel}</td>
-                <td className="p-4">{statusBadge(e.status)}</td>
-                <td className="p-4 text-gray-500">{e.date}</td>
-
-                <td className="p-4 text-right">
-                  <button className="inline-flex items-center gap-1 text-blue-600 hover:underline">
-                    <Eye className="w-4 h-4" />
-                    View
-                  </button>
-                </td>
+        {/* TABLE */}
+        <div className="bg-white rounded-xl shadow overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-gray-600 text-left">
+              <tr>
+                <th className="p-4">ID</th>
+                <th className="p-4">Student</th>
+                <th className="p-4">Course</th>
+                <th className="p-4">Year</th>
+                <th className="p-4">Status</th>
+                <th className="p-4">Date</th>
+                <th className="p-4 text-right">Action</th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
 
-        </table>
+            <tbody>
+              {filtered.map((e) => (
+                <tr key={e.id} className="border-t hover:bg-gray-50">
+                  <td className="p-4 font-medium">{e.id}</td>
+                  <td className="p-4">{e.studentName}</td>
+                  <td className="p-4">{e.course}</td>
+                  <td className="p-4">{e.yearLevel}</td>
+                  <td className="p-4">{statusBadge(e.status)}</td>
+                  <td className="p-4 text-gray-500">{e.date}</td>
+
+                  <td className="p-4 text-right flex justify-end gap-2">
+
+                    <button
+                      onClick={() => updateStatus(e.id, "approved")}
+                      className="text-green-600 hover:underline text-xs"
+                    >
+                      <CheckCircle className="w-4 h-4 inline" /> Approve
+                    </button>
+
+                    <button
+                      onClick={() => updateStatus(e.id, "rejected")}
+                      className="text-red-600 hover:underline text-xs"
+                    >
+                      <XCircle className="w-4 h-4 inline" /> Reject
+                    </button>
+
+                    <button className="text-blue-600 hover:underline text-xs">
+                      <Eye className="w-4 h-4 inline" /> View
+                    </button>
+
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

@@ -44,15 +44,19 @@ export default function DashboardLayout({
 
   // 🔥 FORCE SINGLE SOURCE OF TRUTH
   const storedUser = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("cmdi_user") || "null");
-    } catch {
-      return null;
-    }
-  })();
+  try {
+    return JSON.parse(localStorage.getItem("cmdi_user") || "null");
+  } catch {
+    return null;
+  }
+})();
 
-  const role = (storedUser?.role || userRole || "").toLowerCase().trim();
-  const name = storedUser?.name || userName;
+const role =
+  (storedUser?.role ?? userRole ?? "student")
+    .toLowerCase()
+    .trim();
+
+const name = storedUser?.name ?? userName ?? "User";
 
   // DEBUG (KEEP THIS UNTIL EVERYTHING WORKS)
   useEffect(() => {

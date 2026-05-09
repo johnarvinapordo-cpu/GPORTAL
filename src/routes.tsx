@@ -2,43 +2,57 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import LoginPage from "./pages/LoginPage";
 
+// ================= DASHBOARDS =================
 import StudentDashboard from "./pages/StudentDashboard";
 import TeacherDashboard from "./pages/TeacherDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import FinanceDashboard from "./pages/FinanceDashboard";
 import RegistrarDashboard from "./pages/RegistrarDashboard";
 
+// ================= STUDENT =================
 import EnrollmentPage from "./pages/EnrollmentPage";
-import RegistrarEnrollmentPage from "./pages/RegistrarEnrollmentPage";
-
 import GradesPage from "./pages/GradesPage";
 import TuitionPage from "./pages/TuitionPage";
 import EvaluationPage from "./pages/EvaluationPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import StudentListPage from "./pages/StudentListPage";
-import CourseManagementPage from "./pages/CourseManagementPage";
 
+import StudentProfilePage from "./pages/profile/StudentProfilePage";
+import StudentSettingsPage from "./pages/settings/StudentSettingsPage";
+
+// ================= TEACHER =================
+import TeacherProfilePage from "./pages/profile/TeacherProfilePage";
+import TeacherSettingsPage from "./pages/settings/TeacherSettingsPage";
+
+// ================= ADMIN =================
+import AdminReportsPage from "./pages/AdminReportsPage";
+import AdminProfilePage from "./pages/profile/AdminProfilePage";
+import AdminSettingsPage from "./pages/settings/AdminSettingsPage";
+
+// ================= FINANCE =================
 import FinanceStudentAccountsPage from "./pages/FinanceStudentAccountsPage";
 import FinancePaymentsBillingPage from "./pages/FinancePaymentsBillingPage";
 import FinanceReportsPage from "./pages/FinanceReportsPage";
 
+import FinanceProfilePage from "./pages/profile/FinanceProfilePage";
+import FinanceSettingsPage from "./pages/settings/FinanceSettingsPage";
+
+// ================= REGISTRAR =================
+import RegistrarEnrollmentPage from "./pages/RegistrarEnrollmentPage";
 import RegistrarStudentRecordsPage from "./pages/RegistrarStudentRecordsPage";
 
-import NotificationsPage from "./pages/NotificationsPage";
-import ProfilePage from "./pages/ProfilePage";
+import RegistrarProfilePage from "./pages/profile/RegistrarProfilePage";
+import RegistrarSettingsPage from "./pages/settings/RegistrarSettingsPage";
 
-// ✅ NEW IMPORT (FIX)
-import AdminReportsPage from "./pages/AdminReportsPage";
-import AdminProfilePage from "./pages/AdminProfilePage";
-import AdminSettingsPage from "./pages/AdminSettingsPage";
+// ================= SHARED =================
+import NotificationsPage from "./pages/NotificationsPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+
 import { useAuth } from "./context/AuthContext";
 
-// AUTH GUARD
+// ================= AUTH GUARD =================
 const ProtectedRoute = ({ children, role }: any) => {
   const { user, loading } = useAuth();
 
   if (loading) return null;
-
   if (!user) return <Navigate to="/" replace />;
 
   if (role && user.role !== role) {
@@ -48,13 +62,11 @@ const ProtectedRoute = ({ children, role }: any) => {
   return children;
 };
 
+// ================= ROUTER =================
 export const router = createBrowserRouter([
 
   // ================= LOGIN =================
-  {
-    path: "/",
-    element: <LoginPage />,
-  },
+  { path: "/", element: <LoginPage /> },
 
   // ================= STUDENT =================
   {
@@ -70,6 +82,15 @@ export const router = createBrowserRouter([
   { path: "/student/tuition", element: <TuitionPage /> },
   { path: "/student/evaluation", element: <EvaluationPage /> },
 
+  { path: "/student/profile", element: <StudentProfilePage /> },
+  { path: "/student/settings", element: <StudentSettingsPage /> },
+  { path: "/student/reports", element: <AnalyticsPage /> },
+
+  {
+    path: "/student/notifications",
+    element: <NotificationsPage userRole="student" userName="Student" />,
+  },
+
   // ================= TEACHER =================
   {
     path: "/teacher",
@@ -79,35 +100,13 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  { path: "/teacher/courses", element: <CourseManagementPage /> },
-  { path: "/teacher/grades", element: <GradesPage /> },
-  { path: "/teacher/students", element: <StudentListPage /> },
-  { path: "/teacher/evaluation", element: <EvaluationPage /> },
 
-  {
-    path: "/teacher/reports",
-    element: <AnalyticsPage />,
-  },
+  { path: "/teacher/profile", element: <TeacherProfilePage /> },
+  { path: "/teacher/settings", element: <TeacherSettingsPage /> },
 
   {
     path: "/teacher/notifications",
-    element: (
-      <NotificationsPage userRole="teacher" userName="Teacher" />
-    ),
-  },
-
-  {
-    path: "/teacher/profile",
-    element: (
-      <ProfilePage userRole="teacher" userName="Teacher" />
-    ),
-  },
-
-  {
-    path: "/teacher/settings",
-    element: (
-      <ProfilePage userRole="teacher" userName="Teacher" />
-    ),
+    element: <NotificationsPage userRole="teacher" userName="Teacher" />,
   },
 
   // ================= ADMIN =================
@@ -120,35 +119,14 @@ export const router = createBrowserRouter([
     ),
   },
 
-  { path: "/admin/analytics", element: <AnalyticsPage /> },
-
-  { path: "/admin/students", element: <StudentListPage /> },
-  { path: "/admin/courses", element: <CourseManagementPage /> },
-  { path: "/admin/enrollment", element: <EnrollmentPage /> },
-  { path: "/admin/grades", element: <GradesPage /> },
-  { path: "/admin/financial", element: <TuitionPage /> },
-
-  // ✅ FIXED: REAL SEPARATE REPORT PAGE
-  {
-    path: "/admin/reports",
-    element: <AdminReportsPage />,
-  },
+  { path: "/admin/reports", element: <AdminReportsPage /> },
+  { path: "/admin/profile", element: <AdminProfilePage /> },
+  { path: "/admin/settings", element: <AdminSettingsPage /> },
 
   {
     path: "/admin/notifications",
-    element: (
-      <NotificationsPage userRole="admin" userName="Administrator" />
-    ),
+    element: <NotificationsPage userRole="admin" userName="Administrator" />,
   },
-
-{
-  path: "/admin/profile",
-  element: <AdminProfilePage />,
-},
-{
-  path: "/admin/settings",
-  element: <AdminSettingsPage />,
-},
 
   // ================= FINANCE =================
   {
@@ -159,22 +137,13 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  { path: "/finance/students", element: <FinanceStudentAccountsPage /> },
-  { path: "/finance/payments", element: <FinancePaymentsBillingPage /> },
-  { path: "/finance/reports", element: <FinanceReportsPage /> },
+
+  { path: "/finance/profile", element: <FinanceProfilePage /> },
+  { path: "/finance/settings", element: <FinanceSettingsPage /> },
 
   {
     path: "/finance/notifications",
-    element: (
-      <NotificationsPage userRole="finance" userName="Finance Officer" />
-    ),
-  },
-
-  {
-    path: "/finance/profile",
-    element: (
-      <ProfilePage userRole="finance" userName="Finance Officer" />
-    ),
+    element: <NotificationsPage userRole="finance" userName="Finance Officer" />,
   },
 
   // ================= REGISTRAR =================
@@ -188,59 +157,16 @@ export const router = createBrowserRouter([
   },
 
   { path: "/registrar/enrollment", element: <RegistrarEnrollmentPage /> },
+  { path: "/registrar/students", element: <RegistrarStudentRecordsPage /> },
+
+  { path: "/registrar/profile", element: <RegistrarProfilePage /> },
+  { path: "/registrar/settings", element: <RegistrarSettingsPage /> },
 
   {
-    path: "/registrar/students",
-    element: <RegistrarStudentRecordsPage />,
-  },
-
-  {
-    path: "/registrar/subjects",
-    element: <CourseManagementPage />,
-  },
-
-  {
-    path: "/registrar/reports",
-    element: <AnalyticsPage />,
-  },
-
-  {
-    path: "/registrar/settings",
-    element: (
-      <ProfilePage userRole="registrar" userName="Registrar Officer" />
-    ),
-  },
-
-  // ================= STUDENT EXTRA PAGES =================
-  {
-    path: "/student/notifications",
-    element: (
-      <NotificationsPage userRole="student" userName="Student" />
-    ),
-  },
-
-  {
-    path: "/student/profile",
-    element: (
-      <ProfilePage userRole="student" userName="Student" />
-    ),
-  },
-
-  {
-    path: "/student/reports",
-    element: <AnalyticsPage />,
-  },
-
-  {
-    path: "/student/settings",
-    element: (
-      <ProfilePage userRole="student" userName="Student" />
-    ),
+    path: "/registrar/notifications",
+    element: <NotificationsPage userRole="registrar" userName="Registrar Officer" />,
   },
 
   // ================= FALLBACK =================
-  {
-    path: "*",
-    element: <Navigate to="/" />,
-  },
+  { path: "*", element: <Navigate to="/" /> },
 ]);
