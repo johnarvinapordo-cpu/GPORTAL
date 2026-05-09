@@ -62,10 +62,14 @@ export default function DashboardLayout({
   // ================= NAV ITEMS =================
 
   const studentNavItems: NavItem[] = [
-    { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/student" },
-    { label: "Enrollment", icon: <BookOpen className="w-5 h-5" />, path: "/student/enrollment" },
-    { label: "Grades", icon: <GraduationCap className="w-5 h-5" />, path: "/student/grades" },
-  ];
+  { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/student" },
+  { label: "Enrollment", icon: <BookOpen className="w-5 h-5" />, path: "/student/enrollment" },
+  { label: "Grades", icon: <GraduationCap className="w-5 h-5" />, path: "/student/grades" },
+  { label: "Tuition / Payments", icon: <DollarSign className="w-5 h-5" />, path: "/student/tuition" },
+  { label: "Evaluations", icon: <ClipboardCheck className="w-5 h-5" />, path: "/student/evaluation" },
+  { label: "Notifications", icon: <Bell className="w-5 h-5" />, path: "/student/notifications" },
+  { label: "Profile", icon: <User className="w-5 h-5" />, path: "/student/profile" },
+];
 
   const teacherNavItems: NavItem[] = [
     { label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, path: "/teacher" },

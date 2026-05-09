@@ -9,6 +9,8 @@ import FinanceDashboard from "./pages/FinanceDashboard";
 import RegistrarDashboard from "./pages/RegistrarDashboard";
 
 import EnrollmentPage from "./pages/EnrollmentPage";
+import RegistrarEnrollmentPage from "./pages/RegistrarEnrollmentPage";
+
 import GradesPage from "./pages/GradesPage";
 import TuitionPage from "./pages/TuitionPage";
 import EvaluationPage from "./pages/EvaluationPage";
@@ -105,16 +107,24 @@ export const router = createBrowserRouter([
   { path: "/finance/students", element: <FinanceStudentAccountsPage /> },
   { path: "/finance/payments", element: <FinancePaymentsBillingPage /> },
   { path: "/finance/reports", element: <FinanceReportsPage /> },
+
   {
     path: "/finance/notifications",
     element: (
-      <NotificationsPage userRole="finance" userName="Finance Officer" />
+      <NotificationsPage
+        userRole="finance"
+        userName="Finance Officer"
+      />
     ),
   },
+
   {
     path: "/finance/profile",
     element: (
-      <ProfilePage userRole="finance" userName="Finance Officer" />
+      <ProfilePage
+        userRole="finance"
+        userName="Finance Officer"
+      />
     ),
   },
 
@@ -128,14 +138,32 @@ export const router = createBrowserRouter([
     ),
   },
 
-  // existing working pages
-  { path: "/registrar/students", element: <RegistrarStudentRecordsPage /> },
-  { path: "/registrar/enrollment", element: <EnrollmentPage /> },
+  { path: "/registrar/enrollment", element: <RegistrarEnrollmentPage /> },
 
-  // 🔥 NEW FIXED PAGES (YOU WERE MISSING THESE)
-  { path: "/registrar/subjects", element: <CourseManagementPage /> },
-  { path: "/registrar/reports", element: <AnalyticsPage /> },
-  { path: "/registrar/settings", element: <ProfilePage userRole="registrar" userName="Registrar Officer" /> },
+  {
+    path: "/registrar/students",
+    element: <RegistrarStudentRecordsPage />,
+  },
+
+  {
+    path: "/registrar/subjects",
+    element: <CourseManagementPage />,
+  },
+
+  {
+    path: "/registrar/reports",
+    element: <AnalyticsPage />,
+  },
+
+  {
+    path: "/registrar/settings",
+    element: (
+      <ProfilePage
+        userRole="registrar"
+        userName="Registrar Officer"
+      />
+    ),
+  },
 
   // ================= FALLBACK =================
   {
